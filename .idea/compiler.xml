@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="bmi_web_app" target="1.5" />
+      <module name="bmi_web_app" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
