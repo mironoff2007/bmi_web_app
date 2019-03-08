@@ -34,10 +34,11 @@ public class BmiRecord {
         this.dateTime = dateTime;
     }
 
-    public BmiRecord(float bmi, int weight) {
-        this.bmi = bmi;
+    public BmiRecord(float height, int weight) {
+
         this.weight = weight;
         this.dateTime=LocalDateTime.now();
+        this.bmi=weight/height/height;
     }
 
     public BmiRecord() { }
