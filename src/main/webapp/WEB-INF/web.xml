@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>HelloServlet</servlet-name>
-        <servlet-class>org.mycompany.myname.HelloServlet</servlet-class>
+        <servlet-class>com.mironov.bmi.HelloServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

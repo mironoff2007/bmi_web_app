@@ -4485,12 +4485,9 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$GotText = function (a) {
+var author$project$Main_inc_decr$initialModel = {count: 0, str: ''};
+var author$project$Main_inc_decr$GotText = function (a) {
 	return {$: 'GotText', a: a};
-};
-var author$project$Main$Loading = {$: 'Loading'};
-var elm$core$Basics$identity = function (x) {
-	return x;
 };
 var elm$core$Result$Ok = function (a) {
 	return {$: 'Ok', a: a};
@@ -4500,6 +4497,9 @@ var elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
@@ -5837,38 +5837,42 @@ var elm$http$Http$get = function (r) {
 	return elm$http$Http$request(
 		{body: elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
 };
-var author$project$Main$init = function (_n0) {
-	return _Utils_Tuple2(
-		author$project$Main$Loading,
-		elm$http$Http$get(
-			{
-				expect: elm$http$Http$expectString(author$project$Main$GotText),
-				url: 'https://elm-lang.org/assets/public-opinion.txt'
-			}));
-};
-var elm$core$Platform$Sub$batch = _Platform_batch;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Main$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
-};
-var author$project$Main$Failure = {$: 'Failure'};
-var author$project$Main$Success = function (a) {
-	return {$: 'Success', a: a};
-};
-var elm$core$Platform$Cmd$batch = _Platform_batch;
-var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Main$update = F2(
+var author$project$Main_inc_decr$getPublicOpinion = elm$http$Http$get(
+	{
+		expect: elm$http$Http$expectString(author$project$Main_inc_decr$GotText),
+		url: 'https://elm-lang.org/assets/public-opinion.txt'
+	});
+var elm$core$Debug$toString = _Debug_toString;
+var author$project$Main_inc_decr$update = F2(
 	function (msg, model) {
-		var result = msg.a;
-		if (result.$ === 'Ok') {
-			var fullText = result.a;
-			return _Utils_Tuple2(
-				author$project$Main$Success(fullText),
-				elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(author$project$Main$Failure, elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'Increment':
+				return _Utils_update(
+					model,
+					{count: model.count + 1});
+			case 'Decrement':
+				return _Utils_update(
+					model,
+					{count: model.count - 1});
+			case 'Method':
+				return _Utils_update(
+					model,
+					{
+						str: elm$core$Debug$toString(author$project$Main_inc_decr$getPublicOpinion)
+					});
+			default:
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var url = result.a;
+					return model;
+				} else {
+					return model;
+				}
 		}
 	});
+var author$project$Main_inc_decr$Decrement = {$: 'Decrement'};
+var author$project$Main_inc_decr$Increment = {$: 'Increment'};
+var author$project$Main_inc_decr$Method = {$: 'Method'};
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
@@ -5884,26 +5888,84 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var elm$html$Html$pre = _VirtualDom_node('pre');
+var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Main$view = function (model) {
-	switch (model.$) {
-		case 'Failure':
-			return elm$html$Html$text('I was unable to load your book.');
-		case 'Loading':
-			return elm$html$Html$text('Loading...');
-		default:
-			var fullText = model.a;
-			return A2(
-				elm$html$Html$pre,
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var author$project$Main_inc_decr$view = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(author$project$Main_inc_decr$Increment)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('+1')
+					])),
+				A2(
+				elm$html$Html$div,
 				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text(fullText)
-					]));
-	}
+						elm$html$Html$text(
+						elm$core$String$fromInt(model.count))
+					])),
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(author$project$Main_inc_decr$Decrement)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('-1')
+					])),
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(author$project$Main_inc_decr$Method)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('method')
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(model.str)
+					]))
+			]));
 };
+var elm$core$Platform$Cmd$batch = _Platform_batch;
+var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
+var elm$core$Platform$Sub$batch = _Platform_batch;
+var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
 };
@@ -6119,8 +6181,25 @@ var elm$url$Url$fromString = function (str) {
 		elm$url$Url$Https,
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
-var elm$browser$Browser$element = _Browser_element;
-var author$project$Main$main = elm$browser$Browser$element(
-	{init: author$project$Main$init, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
-_Platform_export({'Main':{'init':author$project$Main$main(
+var elm$browser$Browser$sandbox = function (impl) {
+	return _Browser_element(
+		{
+			init: function (_n0) {
+				return _Utils_Tuple2(impl.init, elm$core$Platform$Cmd$none);
+			},
+			subscriptions: function (_n1) {
+				return elm$core$Platform$Sub$none;
+			},
+			update: F2(
+				function (msg, model) {
+					return _Utils_Tuple2(
+						A2(impl.update, msg, model),
+						elm$core$Platform$Cmd$none);
+				}),
+			view: impl.view
+		});
+};
+var author$project$Main_inc_decr$main = elm$browser$Browser$sandbox(
+	{init: author$project$Main_inc_decr$initialModel, update: author$project$Main_inc_decr$update, view: author$project$Main_inc_decr$view});
+_Platform_export({'Main_inc_decr':{'init':author$project$Main_inc_decr$main(
 	elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
