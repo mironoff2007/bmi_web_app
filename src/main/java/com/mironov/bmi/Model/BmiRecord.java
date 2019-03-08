@@ -42,7 +42,7 @@ public class BmiRecord {
 
         this.weight = weight;
         this.dateTime=LocalDateTime.now().toString();
-        this.bmi=weight/height/height/1000;
+        this.bmi=weight/height/height*1000;
     }
 
     public BmiRecord() { }
