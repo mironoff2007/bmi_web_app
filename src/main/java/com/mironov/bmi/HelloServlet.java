@@ -33,7 +33,7 @@ public class HelloServlet extends HttpServlet {
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
         setAccessControlHeaders(httpServletResponse);
-        String jsonString=gson.toJson(service.getUserBmiList(1).get(1));
+        String jsonString=gson.toJson(service.getUserBmiList(1));
         httpServletResponse.getWriter().write(jsonString);
         httpServletRequest.setAttribute("bmi",jsonString);
         System.out.println(jsonString);
