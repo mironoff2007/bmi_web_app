@@ -27,16 +27,27 @@ main =
 type State
   = Failure
   | Loading
-  | Success String
+  | Success Bmi
 
 
 type alias Model =
     { state : State
-    , person : Person
+    , person : Bmi
     }
 
 
-type alias Person = { name : String, age : Int, height : Float }
+type alias Bmi = {
+    bmi : Float,
+    dateTime : String,
+    weight : Int
+    }
+
+bmiDecoder : Decoder Bmi
+bmiDecoder =
+  map3 Bmi
+    (field "bmi" float)
+    (field "dateTime" string)
+    (field "weight"  int)
 
 init : () -> (State, Cmd Msg)
 init _ =
@@ -48,20 +59,20 @@ init _ =
 
 
 type Msg
-  = MorePlease
-  | GotGif (Result Http.Error String)
+  = Load
+  | GotBmi(Result Http.Error Bmi)
 
 
 update : Msg -> State -> (State, Cmd Msg)
 update msg model =
   case msg of
-    MorePlease ->
+    Load ->
       (Loading, getRandomCatGif)
 
-    GotGif result ->
+    GotBmi result ->
       case result of
-        Ok url ->
-          (Success url, Cmd.none)
+        Ok bmi ->
+          (Success bmi, Cmd.none)
 
         Err _ ->
           (Failure, Cmd.none)
@@ -79,31 +90,52 @@ subscriptions state =
 
 -- VIEW
 
+viewTableHeader : Html Msg
+viewTableHeader =
+    tr []
+        [ th []
+            [ text "BMI |" ]
+        , th []
+            [ text "| Date Time |" ]
+        , th []
+            [ text " Weight" ]
+        ]
 
 view : State -> Html Msg
 view state =
   div []
-    [ h2 [] [ text "Random Cats" ]
+    [ h2 [] [ text "table" ]
+    , viewTableHeader
     , viewGif state
     ]
 
+viewBmi :  Bmi -> Html Msg
+viewBmi bmi =
+    tr []
+        [ td []
+            [ text (Debug.toString bmi.bmi) ]
+        , td []
+            [ text bmi.dateTime ]
+        , td []
+            [ text (Debug.toString bmi.weight) ]
+        ]
 
 viewGif : State -> Html Msg
 viewGif state =
   case state of
     Failure ->
       div []
-        [ text "I could not load a random cat for some reason. "
-        , button [ onClick MorePlease ] [ text "Try Again!" ]
+        [ text "I could not load  "
+        , button [ onClick Load ] [ text "Try Again!" ]
         ]
 
     Loading ->
       text "Loading..."
 
-    Success url ->
+    Success bmi ->
       div []
-        [ button [ onClick MorePlease, style "display" "block" ] [ text "More Please!" ]
-        , img [ src url ] []
+        [ button [ onClick Load, style "display" "block" ] [ text "Load" ]
+            , (viewBmi bmi)
         ]
 
 
@@ -114,19 +146,11 @@ viewGif state =
 getRandomCatGif : Cmd Msg
 getRandomCatGif =
   Http.get
-    { url = "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=cat"
-    , expect = Http.expectJson GotGif gifDecoder
+    { url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
+    , expect = Http.expectJson GotBmi bmiDecoder
     }
 
 
-gifDecoder : Decoder String
-gifDecoder =
-  field "data" (field "image_url" string)
 
 
-person : Decoder Person
-person =
-  map3 Person
-    (at ["name"] string)
-    (at ["info","age"] int)
-    (at ["info","height"] float)
+
