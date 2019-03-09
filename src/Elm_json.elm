@@ -94,9 +94,9 @@ viewTableHeader : Html Msg
 viewTableHeader =
     tr []
         [ th []
-            [ text "BMI |" ]
+            [ text "BMI      |" ]
         , th []
-            [ text "| Date Time |" ]
+            [ text "      Date Time      |" ]
         , th []
             [ text " Weight" ]
         ]
@@ -104,20 +104,19 @@ viewTableHeader =
 view : State -> Html Msg
 view state =
   div []
-    [ h2 [] [ text "table" ]
-    , viewTableHeader
-    , viewGif state
+    [
+    viewGif state
     ]
 
 viewBmi :  Bmi -> Html Msg
 viewBmi bmi =
     tr []
         [ td []
-            [ text (Debug.toString bmi.bmi) ]
+            [ text (Debug.toString bmi.bmi++"   |  ") ]
         , td []
-            [ text bmi.dateTime ]
+            [ text (bmi.dateTime ++ " | ")]
         , td []
-            [ text (Debug.toString bmi.weight) ]
+            [ text (Debug.toString bmi.weight++" |") ]
         ]
 
 viewGif : State -> Html Msg
@@ -135,6 +134,8 @@ viewGif state =
     Success bmi ->
       div []
         [ button [ onClick Load, style "display" "block" ] [ text "Load" ]
+            ,h2 [] [ text "table" ]
+            , viewTableHeader
             , (viewBmi bmi)
         ]
 

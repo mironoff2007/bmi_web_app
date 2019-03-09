@@ -27,6 +27,7 @@ public class HelloServlet extends HttpServlet {
         service.saveUser(1,178,"Vasja");
         service.saveBmi(1,178,65);
         service.saveBmi(1,178,68);
+
     }
 
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)

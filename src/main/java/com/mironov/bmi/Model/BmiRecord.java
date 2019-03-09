@@ -1,6 +1,7 @@
 package com.mironov.bmi.Model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class BmiRecord {
 
@@ -12,6 +13,7 @@ public class BmiRecord {
 
     private String dateTime;
 
+    DateTimeFormatter formatter;
 
     public float getBmi() {
         return bmi;
@@ -41,11 +43,13 @@ public class BmiRecord {
     public BmiRecord(float height, int weight) {
 
         this.weight = weight;
-        this.dateTime=LocalDateTime.now().toString();
+
+        formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd  HH:mm:ss");
+        this.dateTime=LocalDateTime.now().format(formatter);
+
         this.bmi=weight/height/height*1000;
     }
 
-    public BmiRecord() { }
 
     @Override
     public String toString() {
