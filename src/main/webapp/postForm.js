@@ -4964,12 +4964,22 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$PostForm$init = function (_n0) {
 	return _Utils_Tuple2(
-		{result: elm$core$Maybe$Nothing},
+		{inputW: '', result: elm$core$Maybe$Nothing},
 		elm$core$Platform$Cmd$none);
 };
 var author$project$PostForm$GotIt = function (a) {
 	return {$: 'GotIt', a: a};
 };
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var elm$core$String$toInt = _String_toInt;
 var elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -5848,7 +5858,7 @@ var elm$http$Http$post = function (r) {
 	return elm$http$Http$request(
 		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
 };
-var elm$json$Json$Encode$float = _Json_wrap;
+var elm$json$Json$Encode$int = _Json_wrap;
 var elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -5864,38 +5874,56 @@ var elm$json$Json$Encode$object = function (pairs) {
 };
 var author$project$PostForm$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'PostIt') {
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{result: elm$core$Maybe$Nothing}),
-				elm$http$Http$post(
-					{
-						body: elm$http$Http$jsonBody(
-							elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'weight',
-										elm$json$Json$Encode$float(99.9)),
-										_Utils_Tuple2(
-										'height',
-										elm$json$Json$Encode$float(199.9))
-									]))),
-						expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
-						url: 'http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello'
-					}));
-		} else {
-			var result = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						result: elm$core$Maybe$Just(result)
-					}),
-				elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'PostIt':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{result: elm$core$Maybe$Nothing}),
+					elm$http$Http$post(
+						{
+							body: elm$http$Http$jsonBody(
+								elm$json$Json$Encode$object(
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											'weight',
+											elm$json$Json$Encode$int(
+												A2(
+													elm$core$Maybe$withDefault,
+													0,
+													elm$core$String$toInt(model.inputW)))),
+											_Utils_Tuple2(
+											'height',
+											elm$json$Json$Encode$int(180)),
+											_Utils_Tuple2(
+											'id',
+											elm$json$Json$Encode$int(1))
+										]))),
+							expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
+							url: 'http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello'
+						}));
+			case 'GotIt':
+				var result = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							result: elm$core$Maybe$Just(result)
+						}),
+					elm$core$Platform$Cmd$none);
+			default:
+				var str = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{inputW: str}),
+					elm$core$Platform$Cmd$none);
 		}
 	});
+var author$project$PostForm$Change = function (a) {
+	return {$: 'Change', a: a};
+};
 var author$project$PostForm$PostIt = {$: 'PostIt'};
 var elm$core$Debug$toString = _Debug_toString;
 var elm$core$Basics$identity = function (x) {
@@ -5918,8 +5946,18 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 };
 var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$input = _VirtualDom_node('input');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var elm$json$Json$Encode$string = _Json_wrap;
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5936,6 +5974,39 @@ var elm$html$Html$Events$onClick = function (msg) {
 		elm$html$Html$Events$on,
 		'click',
 		elm$json$Json$Decode$succeed(msg));
+};
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$json$Json$Decode$string = _Json_decodeString;
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
 };
 var author$project$PostForm$view = function (model) {
 	return A2(
@@ -5960,7 +6031,15 @@ var author$project$PostForm$view = function (model) {
 					[
 						elm$html$Html$text(
 						'Response: ' + elm$core$Debug$toString(model.result))
-					]))
+					])),
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$value(model.inputW),
+						elm$html$Html$Events$onInput(author$project$PostForm$Change)
+					]),
+				_List_Nil)
 			]));
 };
 var elm$browser$Browser$External = function (a) {
@@ -6071,7 +6150,6 @@ var elm$core$String$left = F2(
 		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
 	});
 var elm$core$String$contains = _String_contains;
-var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
 		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};

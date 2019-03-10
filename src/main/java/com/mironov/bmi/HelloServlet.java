@@ -23,6 +23,24 @@ public class HelloServlet extends HttpServlet {
 
     private Gson gson = new Gson();
 
+    private class JsonObject{
+     int height;
+     int weight;
+     int id;
+
+        public int getHeight() {
+            return height;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+        public int getId() {
+            return id;
+        }
+    }
+
     public HelloServlet(){
         Injector injector= Guice.createInjector(new ServiceModule());
         service= injector.getInstance(Service.class);
@@ -44,8 +62,12 @@ public class HelloServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
+        setAccessControlHeadersPost(httpServletResponse);
+        String body=getBody(httpServletRequest);
+        System.out.println(body);
 
-        System.out.println(getBody(httpServletRequest));
+        JsonObject obj=gson.fromJson(body,JsonObject.class);
+        service.saveBmi(obj.id,obj.height,obj.weight);
         System.out.println(httpServletResponse.toString());
 
     }
@@ -86,6 +108,13 @@ public class HelloServlet extends HttpServlet {
     private void setAccessControlHeaders(HttpServletResponse resp) {
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
         resp.setHeader("Access-Control-Allow-Methods", "GET");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+    }
+
+    private void setAccessControlHeadersPost(HttpServletResponse resp) {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+        resp.setHeader("Access-Control-Allow-Methods", "POST");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
     }

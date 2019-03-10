@@ -1,25 +1,29 @@
 module PostForm exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html, button, div, input, text)
+import Html.Attributes exposing (placeholder, value)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as JE
-import Json.Decode as JD
+import Json.Decode as JD exposing (Decoder)
+
 
 
 type alias Model =
     { result : Maybe (Result Http.Error ())
+     ,inputW:String
     }
 
 type alias User =
-    { weight : Float
-    , height : Float
+    { weight : Int
+    , height : Int
+    , id     : Int
     }
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ({ result = Nothing }
+    ({ result = Nothing , inputW=""}
     , Cmd.none
     )
 
@@ -27,10 +31,11 @@ init () =
 type Msg
     = PostIt
     | GotIt (Result Http.Error ())
+    | Change String
 
 userDecoder : JD.Decoder User
 userDecoder =
-    JD.map2 User (JD.field "weight" JD.float) (JD.field "height" JD.float)
+    JD.map3 User (JD.field "weight" JD.int) (JD.field "height" JD.int) (JD.field "id" JD.int)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -41,8 +46,9 @@ update msg model =
                 { url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
                 , body = Http.jsonBody <|
                     JE.object
-                        [("weight", JE.float 99.9)
-                        , ("height", JE.float 199.9)
+                        [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
+                        , ("height", JE.int 180)
+                        , ("id", JE.int 1)
                         ]
                 , expect = Http.expectWhatever GotIt
                 }
@@ -52,6 +58,12 @@ update msg model =
             ({ model | result = Just result }
             , Cmd.none
             )
+        Change str->(
+              { model | inputW = str },Cmd.none
+              )
+
+
+
 
 
 view : Model -> Html Msg
@@ -59,6 +71,9 @@ view model =
     div []
         [ button [ onClick PostIt ] [ text "POST" ]
         , div [] [ text <| "Response: " ++ Debug.toString model.result ]
+        ,input [ value model.inputW, onInput Change ] []
+
+
         ]
 
 
