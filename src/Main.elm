@@ -6,11 +6,11 @@ import Html.Events exposing (onClick)
 import Http
 
 
-    type alias Model =
-        {
-         count : Int,
-         str:String
-        }
+type alias Model =
+    {
+     count : Int,
+     str:String
+    }
 
 
 initialModel : Model

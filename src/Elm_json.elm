@@ -4,9 +4,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as D
-import Json.Decode exposing (Decoder, field, map2, string)
-import Json.Decode exposing (Decoder, at, float, int, map3, string)
-import FormatNumber.Locales exposing (Locale, frenchLocale, spanishLocale, usLocale)
+import Json.Decode exposing (Decoder, field, string)
+import Json.Decode exposing (Decoder, float, int, map3, string)
+import FormatNumber.Locales exposing (Locale)
 
 import FormatNumber exposing (format)
 
@@ -19,7 +19,6 @@ main =
     , update = update
     , subscriptions = subscriptions
     , view = view
-
     }
 
 
@@ -60,7 +59,7 @@ bmiListDecoder =
 
 init : () -> (State, Cmd Msg)
 init _ =
-  (Loading, getRandomCatGif)
+  (Loading, getBmiJsonList)
 
 
 
@@ -76,7 +75,7 @@ update : Msg -> State -> (State, Cmd Msg)
 update msg model =
   case msg of
     Load ->
-      (Loading, getRandomCatGif)
+      (Loading, getBmiJsonList)
 
     GotBmi result ->
       case result of
@@ -114,7 +113,7 @@ view : State -> Html Msg
 view state =
   div []
     [
-    viewGif state
+    viewBmiTable state
     ]
 
 
@@ -138,8 +137,8 @@ viewBmis bmis =
                     ([ viewTableHeader ] ++ List.map viewBmi bmis)
                 ]
 
-viewGif : State -> Html Msg
-viewGif state =
+viewBmiTable : State -> Html Msg
+viewBmiTable state =
   case state of
     Failure ->
       div []
@@ -161,8 +160,8 @@ viewGif state =
 -- HTTP
 
 
-getRandomCatGif : Cmd Msg
-getRandomCatGif =
+getBmiJsonList : Cmd Msg
+getBmiJsonList =
   Http.get
     { url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
     , expect = Http.expectJson GotBmi  bmiListDecoder

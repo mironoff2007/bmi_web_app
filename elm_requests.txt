@@ -1,0 +1,3 @@
+elm make src/Elm_json.elm --output=main.js
+
+elm make src/PostForm.elm --output=/src/webapp/postForm.js

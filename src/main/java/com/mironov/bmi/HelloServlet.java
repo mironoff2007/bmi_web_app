@@ -5,7 +5,10 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import com.google.gson.Gson;
 import com.google.inject.Guice;
@@ -33,13 +36,53 @@ public class HelloServlet extends HttpServlet {
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
         setAccessControlHeaders(httpServletResponse);
-        String jsonString=gson.toJson(service.getUserBmiList(1));
+        String jsonString = gson.toJson(service.getUserBmiList(1));
         httpServletResponse.getWriter().write(jsonString);
-        httpServletRequest.setAttribute("bmi",jsonString);
+        httpServletRequest.setAttribute("bmi", jsonString);
         System.out.println(jsonString);
+    }
+
+    public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+            throws IOException {
+
+        System.out.println(getBody(httpServletRequest));
+        System.out.println(httpServletResponse.toString());
 
     }
 
+    public static String getBody(HttpServletRequest request) throws IOException {
+
+        String body = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = null;
+
+        try {
+            InputStream inputStream = request.getInputStream();
+            if (inputStream != null) {
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                char[] charBuffer = new char[128];
+                int bytesRead = -1;
+                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                    stringBuilder.append(charBuffer, 0, bytesRead);
+                }
+            } else {
+                stringBuilder.append("");
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException ex) {
+                    throw ex;
+                }
+            }
+        }
+
+        body = stringBuilder.toString();
+        return body;
+    }
     private void setAccessControlHeaders(HttpServletResponse resp) {
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
         resp.setHeader("Access-Control-Allow-Methods", "GET");
