@@ -8,23 +8,47 @@
 
 <p><a href="http://127.0.0.1:8080/bmi_web_app_war_exploded/postForm.html">Add record</a></p>
 <body>
+
 <main></main>
+
+<form onsubmit="return myFunction()">
+    name: <input type="text" name="name" value="Vasja"><br>
+    <input type="submit" value="Submit">
+</form>
+
+name: <input id="inpN" type="text" name="name" value="Vasja"><br>
+
 <div id="postForm"></div>
 <script src="postForm.js"></script>
 <script>
-    var app = Elm.PostForm.init({ node: document.getElementById('postForm') })
 
+
+    var app = Elm.PostForm.init({node: document.querySelector('main')})
     // you can use ports and stuff here
+    app.ports.receiveData.send(document.getElementById("inpN").value);
+    //document.getElementById('name').value
+    function myFunction() {
+        var app = Elm.PostForm.init({node: document.querySelector('main')})
+        // you can use ports and stuff here
+        app.ports.receiveData.send(document.getElementById("name").value);
+        //document.getElementById('name').value
+    }
+
 </script>
 
 <div id="main"></div>
 <script src="main.js"></script>
 
 <script>
-    var app = Elm.Main.init({ node: document.getElementById('main') })
+
+    var app2 = Elm.Main.init({ node: document.getElementById('main') })
 
     // you can use ports and stuff here
 </script>
+
+
+</body>
+<body>
 
 
 </body>

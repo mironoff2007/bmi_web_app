@@ -1,4 +1,4 @@
-module PostForm exposing (main)
+port module PostForm exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, input, text)
@@ -13,17 +13,19 @@ import Json.Decode as JD exposing (Decoder)
 type alias Model =
     { result : Maybe (Result Http.Error ())
      ,inputW:String
+     ,inputH:String
+     ,inputN:String
     }
 
 type alias User =
     { weight : Int
     , height : Int
-    , id     : Int
+    , name   : String
     }
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ({ result = Nothing , inputW=""}
+    ({ result = Nothing , inputW="", inputH="", inputN=""}
     , Cmd.none
     )
 
@@ -31,11 +33,18 @@ init () =
 type Msg
     = PostIt
     | GotIt (Result Http.Error ())
-    | Change String
+    | ChangeW String
+    | ChangeH String
+    | ChangeN String
+    | ReceivedDataFromJS String
+    | ReceivedW String
+
+port receiveData : (String -> msg) -> Sub msg
+port receiveW : (String -> msg) -> Sub msg
 
 userDecoder : JD.Decoder User
 userDecoder =
-    JD.map3 User (JD.field "weight" JD.int) (JD.field "height" JD.int) (JD.field "id" JD.int)
+    JD.map3 User (JD.field "weight" JD.int) (JD.field "height" JD.int) (JD.field "name" JD.string)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -47,41 +56,62 @@ update msg model =
                 , body = Http.jsonBody <|
                     JE.object
                         [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
-                        , ("height", JE.int 180)
-                        , ("id", JE.int 1)
+                        , ("height",JE.int (String.toInt model.inputH|> Maybe.withDefault 0))
+                        , ("name", JE.string  (model.inputN))
                         ]
                 , expect = Http.expectWhatever GotIt
                 }
             )
 
         GotIt result ->
-            ({ model | result = Just result }
+            ({ model | result = Just result  }
             , Cmd.none
             )
-        Change str->(
+        ChangeW str->(
               { model | inputW = str },Cmd.none
               )
-
-
-
-
+        ChangeH str->(
+               { model | inputH = str },Cmd.none
+               )
+        ChangeN str->(
+                { model | inputN = str },Cmd.none
+                 )
+        ReceivedDataFromJS data ->(
+              { model | inputN =  data },Cmd.none
+              )
+        ReceivedW data ->(
+                  { model | inputW =  data },Cmd.none
+                  )
 
 view : Model -> Html Msg
 view model =
     div []
         [ button [ onClick PostIt ] [ text "POST" ]
-        , div [] [ text <| "Response: " ++ Debug.toString model.result ]
-        ,input [ value model.inputW, onInput Change ] []
+        , div [] [ text <|  if (Debug.toString model.result)=="Just (Err (BadStatus 415))"
+                            then "Response: " ++"wrong number"
+                            else if (Debug.toString model.result)=="Nothing"
+                                 then ""
+                                 else Debug.toString model.result ]
+        , input [ placeholder "Weight",value model.inputW, onInput ChangeW ] []
+        , div []  [input [ placeholder "Height",value model.inputH, onInput ChangeH ] []]
+        , input [ placeholder "name",value model.inputN, onInput ChangeN ] []
 
 
         ]
 
 
+subscriptions : Model-> Sub Msg
+subscriptions model =
+    receiveData ReceivedDataFromJS
+
+subscriptions : Model-> Sub Msg
+subscriptions model =
+    receiveW ReceivedW
+
 main : Program () Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = always Sub.none
-        }
+main =Browser.element
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }

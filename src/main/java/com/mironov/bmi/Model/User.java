@@ -1,6 +1,11 @@
 package com.mironov.bmi.Model;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class User {
+
+
+    private static AtomicInteger counter=new AtomicInteger(0);
 
     private int id;
 
@@ -32,8 +37,9 @@ public class User {
         this.name = name;
     }
 
-    public User(int id, int height, String name) {
-        this.id = id;
+    public User( String name , int height ) {
+        this.id = counter.intValue();
+        counter.incrementAndGet();
         this.height = height;
         this.name = name;
     }

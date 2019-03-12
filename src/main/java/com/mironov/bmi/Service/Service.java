@@ -15,16 +15,16 @@ public class Service {
     public Service() {
     }
 
-    public ArrayList<BmiRecord> getUserBmiList(int userId) {
-        return mockDAO.getUserBmiList(userId);
+    public ArrayList<BmiRecord> getUserBmiList(String name) {
+        return mockDAO.getUserBmiList(name);
     }
 
-    public void saveBmi(int userId, int height, int weight){
-        mockDAO.addBmiRecord(userId , height, weight);
+    public void saveBmi(String name,int height, int weight){
+        mockDAO.addBmiRecord(name , height, weight);
     }
 
-    public void saveUser(int userId, int height, String name){
-        mockDAO.addUser(new User(userId, height,name));
+    public void saveUser( String name,int height){
+        mockDAO.addUser(new User( name,height));
     }
 
 

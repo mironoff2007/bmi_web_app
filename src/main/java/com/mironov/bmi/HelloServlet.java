@@ -26,35 +26,24 @@ public class HelloServlet extends HttpServlet {
     private class JsonObject{
      int height;
      int weight;
-     int id;
+     String name;
 
-        public int getHeight() {
-            return height;
-        }
-
-        public int getWeight() {
-            return weight;
-        }
-
-        public int getId() {
-            return id;
-        }
     }
 
     public HelloServlet(){
         Injector injector= Guice.createInjector(new ServiceModule());
         service= injector.getInstance(Service.class);
 
-        service.saveUser(1,178,"Vasja");
-        service.saveBmi(1,178,65);
-        service.saveBmi(1,178,68);
+        service.saveUser("Vasja",178);
+        service.saveBmi("Vasja",178,65);
+        service.saveBmi("Vasja",178,68);
 
     }
 
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
         setAccessControlHeaders(httpServletResponse);
-        String jsonString = gson.toJson(service.getUserBmiList(1));
+        String jsonString = gson.toJson(service.getUserBmiList("Vasja"));
         httpServletResponse.getWriter().write(jsonString);
         httpServletRequest.setAttribute("bmi", jsonString);
         System.out.println(jsonString);
@@ -62,12 +51,17 @@ public class HelloServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
-        setAccessControlHeadersPost(httpServletResponse);
+
         String body=getBody(httpServletRequest);
         System.out.println(body);
 
         JsonObject obj=gson.fromJson(body,JsonObject.class);
-        service.saveBmi(obj.id,obj.height,obj.weight);
+        if(obj.weight!=0) {
+            service.saveBmi(obj.name, obj.height, obj.weight);
+        }
+        else {
+            httpServletResponse.setStatus(415);
+        }
         System.out.println(httpServletResponse.toString());
 
     }
@@ -112,10 +106,5 @@ public class HelloServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
     }
 
-    private void setAccessControlHeadersPost(HttpServletResponse resp) {
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
-        resp.setHeader("Access-Control-Allow-Methods", "POST");
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-    }
+
 }

@@ -4964,8 +4964,16 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$PostForm$init = function (_n0) {
 	return _Utils_Tuple2(
-		{inputW: '', result: elm$core$Maybe$Nothing},
+		{inputH: '', inputN: '', inputW: '', result: elm$core$Maybe$Nothing},
 		elm$core$Platform$Cmd$none);
+};
+var author$project$PostForm$ReceivedDataFromJS = function (a) {
+	return {$: 'ReceivedDataFromJS', a: a};
+};
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$PostForm$receiveData = _Platform_incomingPort('receiveData', elm$json$Json$Decode$string);
+var author$project$PostForm$subscriptions = function (model) {
+	return author$project$PostForm$receiveData(author$project$PostForm$ReceivedDataFromJS);
 };
 var author$project$PostForm$GotIt = function (a) {
 	return {$: 'GotIt', a: a};
@@ -5872,6 +5880,7 @@ var elm$json$Json$Encode$object = function (pairs) {
 			_Json_emptyObject(_Utils_Tuple0),
 			pairs));
 };
+var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$PostForm$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5895,10 +5904,14 @@ var author$project$PostForm$update = F2(
 													elm$core$String$toInt(model.inputW)))),
 											_Utils_Tuple2(
 											'height',
-											elm$json$Json$Encode$int(180)),
+											elm$json$Json$Encode$int(
+												A2(
+													elm$core$Maybe$withDefault,
+													0,
+													elm$core$String$toInt(model.inputH)))),
 											_Utils_Tuple2(
-											'id',
-											elm$json$Json$Encode$int(1))
+											'name',
+											elm$json$Json$Encode$string(model.inputN))
 										]))),
 							expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
 							url: 'http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello'
@@ -5912,17 +5925,44 @@ var author$project$PostForm$update = F2(
 							result: elm$core$Maybe$Just(result)
 						}),
 					elm$core$Platform$Cmd$none);
-			default:
+			case 'ChangeW':
 				var str = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{inputW: str}),
 					elm$core$Platform$Cmd$none);
+			case 'ChangeH':
+				var str = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{inputH: str}),
+					elm$core$Platform$Cmd$none);
+			case 'ChangeN':
+				var str = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{inputN: str}),
+					elm$core$Platform$Cmd$none);
+			default:
+				var data = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{inputN: data}),
+					elm$core$Platform$Cmd$none);
 		}
 	});
-var author$project$PostForm$Change = function (a) {
-	return {$: 'Change', a: a};
+var author$project$PostForm$ChangeH = function (a) {
+	return {$: 'ChangeH', a: a};
+};
+var author$project$PostForm$ChangeN = function (a) {
+	return {$: 'ChangeN', a: a};
+};
+var author$project$PostForm$ChangeW = function (a) {
+	return {$: 'ChangeW', a: a};
 };
 var author$project$PostForm$PostIt = {$: 'PostIt'};
 var elm$core$Debug$toString = _Debug_toString;
@@ -5949,7 +5989,6 @@ var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$input = _VirtualDom_node('input');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5957,6 +5996,7 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			elm$json$Json$Encode$string(string));
 	});
+var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -5993,7 +6033,6 @@ var elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
 	});
-var elm$json$Json$Decode$string = _Json_decodeString;
 var elm$html$Html$Events$targetValue = A2(
 	elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -6030,14 +6069,39 @@ var author$project$PostForm$view = function (model) {
 				_List_fromArray(
 					[
 						elm$html$Html$text(
-						'Response: ' + elm$core$Debug$toString(model.result))
+						(elm$core$Debug$toString(model.result) === 'Just (Err (BadStatus 415))') ? ('Response: ' + 'wrong number') : ((elm$core$Debug$toString(model.result) === 'Nothing') ? '' : elm$core$Debug$toString(model.result)))
 					])),
 				A2(
 				elm$html$Html$input,
 				_List_fromArray(
 					[
+						elm$html$Html$Attributes$placeholder('Weight'),
 						elm$html$Html$Attributes$value(model.inputW),
-						elm$html$Html$Events$onInput(author$project$PostForm$Change)
+						elm$html$Html$Events$onInput(author$project$PostForm$ChangeW)
+					]),
+				_List_Nil),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$placeholder('Height'),
+								elm$html$Html$Attributes$value(model.inputH),
+								elm$html$Html$Events$onInput(author$project$PostForm$ChangeH)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$placeholder('name'),
+						elm$html$Html$Attributes$value(model.inputN),
+						elm$html$Html$Events$onInput(author$project$PostForm$ChangeN)
 					]),
 				_List_Nil)
 			]));
@@ -6257,18 +6321,7 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$element = _Browser_element;
-var elm$core$Basics$always = F2(
-	function (a, _n0) {
-		return a;
-	});
-var elm$core$Platform$Sub$batch = _Platform_batch;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$PostForm$main = elm$browser$Browser$element(
-	{
-		init: author$project$PostForm$init,
-		subscriptions: elm$core$Basics$always(elm$core$Platform$Sub$none),
-		update: author$project$PostForm$update,
-		view: author$project$PostForm$view
-	});
+	{init: author$project$PostForm$init, subscriptions: author$project$PostForm$subscriptions, update: author$project$PostForm$update, view: author$project$PostForm$view});
 _Platform_export({'PostForm':{'init':author$project$PostForm$main(
 	elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
