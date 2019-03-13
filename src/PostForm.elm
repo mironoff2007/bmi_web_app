@@ -1,9 +1,7 @@
 port module PostForm exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, input, text)
-import Html.Attributes exposing (placeholder, value)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html,  div,  text)
 import Http
 import Json.Encode as JE
 import Json.Decode as JD exposing (Decoder)
@@ -31,16 +29,15 @@ init () =
 
 
 type Msg
-    = PostIt
-    | GotIt (Result Http.Error ())
-    | ChangeW String
-    | ChangeH String
-    | ChangeN String
-    | ReceivedDataFromJS String
+    = 
+      GotIt (Result Http.Error ())
+    | ReceivedN String
     | ReceivedW String
+    | ReceivedH String
 
-port receiveData : (String -> msg) -> Sub msg
+port receiveN_last : (String -> msg) -> Sub msg
 port receiveW : (String -> msg) -> Sub msg
+port receiveH : (String -> msg) -> Sub msg
 
 userDecoder : JD.Decoder User
 userDecoder =
@@ -49,69 +46,63 @@ userDecoder =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        PostIt ->
+        ReceivedN name ->
             ({ model | result = Nothing }
-            , Http.post
-                { url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
-                , body = Http.jsonBody <|
-                    JE.object
-                        [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
-                        , ("height",JE.int (String.toInt model.inputH|> Maybe.withDefault 0))
-                        , ("name", JE.string  (model.inputN))
-                        ]
-                , expect = Http.expectWhatever GotIt
-                }
+            , Http.request
+                           { method = "POST"
+                           , headers = [(Http.header "Access-Control-Allow-Origin" "http://127.0.0.1:8080")
+                                       ,(Http.header "Access-Control-Allow-Methods" "POST")]
+                           , url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
+                           , body = Http.jsonBody <|
+                                    JE.object
+                                    [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
+                                      , ("height",JE.int (String.toInt model.inputH|> Maybe.withDefault 0))
+                                      , ("name", JE.string  (name))
+                                     ]
+                           , expect = Http.expectWhatever GotIt
+                           , timeout = Nothing
+                           , tracker = Nothing
+                           }
+
             )
 
         GotIt result ->
             ({ model | result = Just result  }
             , Cmd.none
             )
-        ChangeW str->(
-              { model | inputW = str },Cmd.none
-              )
-        ChangeH str->(
-               { model | inputH = str },Cmd.none
-               )
-        ChangeN str->(
-                { model | inputN = str },Cmd.none
-                 )
-        ReceivedDataFromJS data ->(
-              { model | inputN =  data },Cmd.none
-              )
-        ReceivedW data ->(
-                  { model | inputW =  data },Cmd.none
+
+        
+        ReceivedW w ->(
+                  { model | inputW =  w },Cmd.none
                   )
+        ReceivedH h ->(
+                  { model | inputH =  h },Cmd.none
+                   )
 
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick PostIt ] [ text "POST" ]
-        , div [] [ text <|  if (Debug.toString model.result)=="Just (Err (BadStatus 415))"
-                            then "Response: " ++"wrong number"
-                            else if (Debug.toString model.result)=="Nothing"
-                                 then ""
-                                 else Debug.toString model.result ]
-        , input [ placeholder "Weight",value model.inputW, onInput ChangeW ] []
-        , div []  [input [ placeholder "Height",value model.inputH, onInput ChangeH ] []]
-        , input [ placeholder "name",value model.inputN, onInput ChangeN ] []
-
+        [ div [] [ text <|  if (Debug.toString model.result)=="Just (Err (BadStatus 415))"
+                                    then "Response: " ++"wrong number"
+                                    else if (Debug.toString model.result)=="Nothing"
+                                         then ""
+                                         else if (Debug.toString model.result)=="Just (Ok ())"
+                                                then "Ok"
+                                                else Debug.toString model.result ]
 
         ]
 
-
 subscriptions : Model-> Sub Msg
-subscriptions model =
-    receiveData ReceivedDataFromJS
-
-subscriptions : Model-> Sub Msg
-subscriptions model =
-    receiveW ReceivedW
+subscriptions _ =Sub.batch[
+    receiveN_last ReceivedN,
+    receiveW ReceivedW,
+    receiveH ReceivedH
+    ]
 
 main : Program () Model Msg
 main =Browser.element
     { init = init
     , view = view
     , update = update
-    , subscriptions = subscriptions
+    , subscriptions =subscriptions
     }

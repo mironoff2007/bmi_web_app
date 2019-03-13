@@ -5,50 +5,60 @@
         /* you can style your program here */
     </style>
 </head>
-
-<p><a href="http://127.0.0.1:8080/bmi_web_app_war_exploded/postForm.html">Add record</a></p>
 <body>
+<table>
+    <tr>
+        <td>name:</td>
+        <td><input id="inpN" type="text" name="name" value="Vasja"></td>
+    </tr>
+    <tr>
+        <td>height:</td>
+        <td><input id="inpH" type="text" name="height" value=""></td>
+    </tr>
+    <tr>
+        <td>weight:</td>
+        <td><input id="inpW" type="text" name="weight" value=""></td>
+    </tr>
+</table>
+
+<br>
+
+<button onclick="post()">Post</button>
 
 <main></main>
-
-<form onsubmit="return myFunction()">
-    name: <input type="text" name="name" value="Vasja"><br>
-    <input type="submit" value="Submit">
-</form>
-
-name: <input id="inpN" type="text" name="name" value="Vasja"><br>
-
 <div id="postForm"></div>
 <script src="postForm.js"></script>
 <script>
-
-
     var app = Elm.PostForm.init({node: document.querySelector('main')})
-    // you can use ports and stuff here
-    app.ports.receiveData.send(document.getElementById("inpN").value);
-    //document.getElementById('name').value
-    function myFunction() {
-        var app = Elm.PostForm.init({node: document.querySelector('main')})
-        // you can use ports and stuff here
-        app.ports.receiveData.send(document.getElementById("name").value);
-        //document.getElementById('name').value
+
+    function post(){
+        app.ports.receiveH.send(document.getElementById("inpH").value);
+        app.ports.receiveW.send(document.getElementById("inpW").value);
+        app.ports.receiveN_last.send(document.getElementById("inpN").value);
+        app2.ports.receiveData.send(document.getElementById("inpN").value);
     }
+    
 
 </script>
 
-<div id="main"></div>
-<script src="main.js"></script>
+
+
+<p><br/></p>
+<button onclick="updateT()">Update Table</button>
+
+<div id="getTable"></div>
+<script src="getTable.js"></script>
 
 <script>
-
-    var app2 = Elm.Main.init({ node: document.getElementById('main') })
-
+    function updateT(){
+        app2.ports.receiveData.send(document.getElementById("inpN").value);
+    }
+    var app2 = Elm.GetTable.init({node: document.getElementById('getTable')})
+    app2.ports.receiveData.send(document.getElementById("inpN").value);
     // you can use ports and stuff here
+
 </script>
 
-
-</body>
-<body>
 
 
 </body>

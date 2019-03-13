@@ -1,14 +1,10 @@
 package com.mironov.bmi;
 
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.inject.Guice;
@@ -24,9 +20,9 @@ public class HelloServlet extends HttpServlet {
     private Gson gson = new Gson();
 
     private class JsonObject{
-     int height;
-     int weight;
-     String name;
+        int height;
+        int weight;
+        String name;
 
     }
 
@@ -42,66 +38,44 @@ public class HelloServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
+        //set access
         setAccessControlHeaders(httpServletResponse);
-        String jsonString = gson.toJson(service.getUserBmiList("Vasja"));
+
+        //get query parameter
+        String qS=httpServletRequest.getQueryString();
+        String[] arr=qS.split("=");
+        String name=arr[1];
+
+        //get and send list of records
+        String jsonString = gson.toJson(service.getUserBmiList(name));
         httpServletResponse.getWriter().write(jsonString);
         httpServletRequest.setAttribute("bmi", jsonString);
-        System.out.println(jsonString);
+
+        System.out.println("Get-"+jsonString);
     }
 
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws IOException {
-
+        //get body of request
         String body=getBody(httpServletRequest);
         System.out.println(body);
 
+        //get fields and check
         JsonObject obj=gson.fromJson(body,JsonObject.class);
-        if(obj.weight!=0) {
+        if(obj.weight>0&&obj.height>0) {
             service.saveBmi(obj.name, obj.height, obj.weight);
         }
         else {
             httpServletResponse.setStatus(415);
         }
-        System.out.println(httpServletResponse.toString());
-
     }
 
     public static String getBody(HttpServletRequest request) throws IOException {
-
-        String body = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader bufferedReader = null;
-
-        try {
-            InputStream inputStream = request.getInputStream();
-            if (inputStream != null) {
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                char[] charBuffer = new char[128];
-                int bytesRead = -1;
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    stringBuilder.append(charBuffer, 0, bytesRead);
-                }
-            } else {
-                stringBuilder.append("");
-            }
-        } catch (IOException ex) {
-            throw ex;
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException ex) {
-                    throw ex;
-                }
-            }
-        }
-
-        body = stringBuilder.toString();
-        return body;
+        return request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
     }
     private void setAccessControlHeaders(HttpServletResponse resp) {
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
-        resp.setHeader("Access-Control-Allow-Methods", "GET");
+        resp.setHeader("Access-Control-Allow-Methods", "GET,POST");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
     }

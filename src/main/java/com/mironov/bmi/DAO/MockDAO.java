@@ -22,8 +22,9 @@ public class MockDAO {
     }
 
     public void addUser(User user){
-            usersMap.put(user.getName(),user);
-            bmiList.add(new ArrayList<>());
+        usersMap.put(user.getName(),user);
+        System.out.println("User added-"+user.toString());
+        bmiList.add(new ArrayList<>());
     }
 
     public User getUserById(int userId) {
@@ -42,8 +43,8 @@ public class MockDAO {
 
     public void addBmiRecord(String name, int height, int weight){
         if(usersMap.containsKey(name)){
-        ArrayList<BmiRecord> userBmiList = getUserBmiList(name);
-        userBmiList.add(new BmiRecord(height,weight));}
+            ArrayList<BmiRecord> userBmiList = getUserBmiList(name);
+            userBmiList.add(new BmiRecord(height,weight));}
         else {
             addUser(new User(name,height));
             ArrayList<BmiRecord> userBmiList = getUserBmiList(name);

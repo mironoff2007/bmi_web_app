@@ -1,9 +1,12 @@
+port module GetTable exposing (main)
+
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as D
+import Json.Encode as JE
 import Json.Decode exposing (Decoder, field, string)
 import Json.Decode exposing (Decoder, float, int, map3, string)
 import FormatNumber.Locales exposing (Locale)
@@ -30,12 +33,19 @@ type State
   = Failure
   | Loading
   | Success (List Bmi)
+  | GetReq String
+
+type Msg
+  = GotBmi(Result Http.Error (List Bmi))
+  | ReceivedN String
+
 
 
 type alias Model =
     { state : State
     , person : Bmi
     , bmis:List Bmi
+    , str:String
     }
 
 
@@ -59,23 +69,25 @@ bmiListDecoder =
 
 init : () -> (State, Cmd Msg)
 init _ =
-  (Loading, getBmiJsonList)
+  (Loading, Cmd.none)
 
 
 
 -- UPDATE
 
 
-type Msg
-  = Load
-  | GotBmi(Result Http.Error (List Bmi))
 
+
+port receiveData : (String -> msg) -> Sub msg
+
+subscriptions : State-> Sub Msg
+subscriptions state =
+    receiveData ReceivedN
 
 update : Msg -> State -> (State, Cmd Msg)
 update msg model =
   case msg of
-    Load ->
-      (Loading, getBmiJsonList)
+
 
     GotBmi result ->
       case result of
@@ -84,15 +96,15 @@ update msg model =
 
         Err _ ->
           (Failure, Cmd.none)
+    ReceivedN str->(GetReq str, upload str)
+
 
 
 
 -- SUBSCRIPTIONS
 
 
-subscriptions : State -> Sub Msg
-subscriptions state =
-  Sub.none
+
 
 
 
@@ -143,30 +155,34 @@ viewBmiTable state =
     Failure ->
       div []
         [ text "I could not load  "
-        , button [ onClick Load ] [ text "Try Again!" ]
         ]
 
     Loading ->
-      text "Loading..."
+      div [][ text "Loading  "]
+
 
     Success bmis ->
       div []
-        [ button [ onClick Load, style "display" "block" ] [ text "Load" ]
-            , (viewBmis bmis)
-        ]
+        [  (viewBmis bmis)]
+    GetReq str->text str
 
 
 
 -- HTTP
 
 
-getBmiJsonList : Cmd Msg
-getBmiJsonList =
-  Http.get
-    { url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
-    , expect = Http.expectJson GotBmi  bmiListDecoder
-    }
 
+upload : String -> Cmd Msg
+upload name =
+  Http.request
+    { method = "GET"
+    , headers = []
+    , url = ("http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello?name="++name)
+    , body = Http.emptyBody
+    , expect = Http.expectJson GotBmi  bmiListDecoder
+    , timeout = Nothing
+    , tracker = Nothing
+    }
 
 
 
