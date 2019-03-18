@@ -30,7 +30,6 @@ public class HelloServlet extends HttpServlet {
         Injector injector= Guice.createInjector(new ServiceModule());
         service= injector.getInstance(Service.class);
 
-        service.saveUser("Vasja",178);
         service.saveBmi("Vasja",178,65);
         service.saveBmi("Vasja",178,68);
 
@@ -42,12 +41,13 @@ public class HelloServlet extends HttpServlet {
         setAccessControlHeaders(httpServletResponse);
 
         //get query parameter
+        /*
         String qS=httpServletRequest.getQueryString();
         String[] arr=qS.split("=");
         String name=arr[1];
-
+        */
         //get and send list of records
-        String jsonString = gson.toJson(service.getUserBmiList(name));
+        String jsonString = gson.toJson(service.getBmiList());
         httpServletResponse.getWriter().write(jsonString);
         httpServletRequest.setAttribute("bmi", jsonString);
 

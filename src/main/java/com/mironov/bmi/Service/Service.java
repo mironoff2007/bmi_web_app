@@ -2,10 +2,9 @@ package com.mironov.bmi.Service;
 
 import com.mironov.bmi.DAO.MockDAO;
 import com.mironov.bmi.Model.BmiRecord;
-import com.mironov.bmi.Model.User;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Service {
 
@@ -15,16 +14,12 @@ public class Service {
     public Service() {
     }
 
-    public ArrayList<BmiRecord> getUserBmiList(String name) {
-        return mockDAO.getUserBmiList(name);
+    public CopyOnWriteArrayList<BmiRecord> getBmiList() {
+        return mockDAO.getBmiList();
     }
 
     public void saveBmi(String name,int height, int weight){
-        mockDAO.addBmiRecord(name , height, weight);
-    }
-
-    public void saveUser( String name,int height){
-        mockDAO.addUser(new User( name,height));
+        mockDAO.addBmiRecord(name, height, weight);
     }
 
 

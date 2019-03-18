@@ -9,9 +9,27 @@ public class BmiRecord {
 
     private int weight;
 
-    //private LocalDateTime dateTime;
+    private String name;
+
+    private int height;
 
     private String dateTime;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
 
     DateTimeFormatter formatter;
 
@@ -40,7 +58,7 @@ public class BmiRecord {
         this.dateTime = dateTime;
     }
     */
-    public BmiRecord(float height, int weight) {
+    public BmiRecord(String name, float height, int weight) {
 
         this.weight = weight;
 
@@ -48,6 +66,8 @@ public class BmiRecord {
         this.dateTime=LocalDateTime.now().format(formatter);
 
         this.bmi=weight/height/height*1000;
+
+        this.name=name;
     }
 
 
