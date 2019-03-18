@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import com.mironov.bmi.Service.Service;
 import com.mironov.bmi.Service.ServiceModule;
 
 
-@WebServlet("/Hello")
+//@WebServlet("/Hello")
+@Singleton
 public class HelloServlet extends HttpServlet {
     private Service service;
 
