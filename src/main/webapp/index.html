@@ -29,13 +29,16 @@
 <div id="postForm"></div>
 <script src="postForm.js"></script>
 <script>
+
     var app = Elm.PostForm.init({node: document.querySelector('main')})
 
     function post(){
+        app.ports.receiveUrl.send(window.location.href);
         app.ports.receiveH.send(document.getElementById("inpH").value);
         app.ports.receiveW.send(document.getElementById("inpW").value);
         app.ports.receiveN_last.send(document.getElementById("inpN").value);
-        app2.ports.receiveData.send(document.getElementById("inpN").value);
+
+        app2.ports.receiveUrl.send(window.location.href);
     }
     
 
@@ -51,10 +54,10 @@
 
 <script>
     function updateT(){
-        app2.ports.receiveData.send(document.getElementById("inpN").value);
+        app2.ports.receiveUrl.send(window.location.href);
     }
     var app2 = Elm.GetTable.init({node: document.getElementById('getTable')})
-    app2.ports.receiveData.send(document.getElementById("inpN").value);
+    app2.ports.receiveUrl.send(window.location.href);
     // you can use ports and stuff here
 
 </script>

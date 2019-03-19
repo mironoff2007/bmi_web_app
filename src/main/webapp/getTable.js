@@ -5003,13 +5003,13 @@ var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$GetTable$init = function (_n0) {
 	return _Utils_Tuple2(author$project$GetTable$Loading, elm$core$Platform$Cmd$none);
 };
-var author$project$GetTable$ReceivedN = function (a) {
-	return {$: 'ReceivedN', a: a};
+var author$project$GetTable$ReceivedURL = function (a) {
+	return {$: 'ReceivedURL', a: a};
 };
 var elm$json$Json$Decode$string = _Json_decodeString;
-var author$project$GetTable$receiveData = _Platform_incomingPort('receiveData', elm$json$Json$Decode$string);
+var author$project$GetTable$receiveUrl = _Platform_incomingPort('receiveUrl', elm$json$Json$Decode$string);
 var author$project$GetTable$subscriptions = function (state) {
-	return author$project$GetTable$receiveData(author$project$GetTable$ReceivedN);
+	return author$project$GetTable$receiveUrl(author$project$GetTable$ReceivedURL);
 };
 var author$project$GetTable$Failure = {$: 'Failure'};
 var author$project$GetTable$GetReq = function (a) {
@@ -5914,7 +5914,7 @@ var elm$http$Http$request = function (r) {
 		elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var author$project$GetTable$upload = function (name) {
+var author$project$GetTable$upload = function (url) {
 	return elm$http$Http$request(
 		{
 			body: elm$http$Http$emptyBody,
@@ -5923,7 +5923,7 @@ var author$project$GetTable$upload = function (name) {
 			method: 'GET',
 			timeout: elm$core$Maybe$Nothing,
 			tracker: elm$core$Maybe$Nothing,
-			url: 'http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello?name=' + name
+			url: url + 'servlet'
 		});
 };
 var author$project$GetTable$update = F2(
@@ -5939,10 +5939,10 @@ var author$project$GetTable$update = F2(
 				return _Utils_Tuple2(author$project$GetTable$Failure, elm$core$Platform$Cmd$none);
 			}
 		} else {
-			var str = msg.a;
+			var url = msg.a;
 			return _Utils_Tuple2(
-				author$project$GetTable$GetReq(str),
-				author$project$GetTable$upload(str));
+				author$project$GetTable$GetReq(url),
+				author$project$GetTable$upload(url));
 		}
 	});
 var cuducos$elm_format_number$Helpers$FormattedNumber = F5(

@@ -13,6 +13,7 @@ type alias Model =
      ,inputW:String
      ,inputH:String
      ,inputN:String
+     ,url:String
     }
 
 type alias User =
@@ -23,7 +24,7 @@ type alias User =
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ({ result = Nothing , inputW="", inputH="", inputN=""}
+    ({ result = Nothing , inputW="", inputH="", inputN="",url=""}
     , Cmd.none
     )
 
@@ -34,10 +35,13 @@ type Msg
     | ReceivedN String
     | ReceivedW String
     | ReceivedH String
+    | ReceivedURL String
+    | Loading
 
 port receiveN_last : (String -> msg) -> Sub msg
 port receiveW : (String -> msg) -> Sub msg
 port receiveH : (String -> msg) -> Sub msg
+port receiveUrl : (String -> msg) -> Sub msg
 
 userDecoder : JD.Decoder User
 userDecoder =
@@ -50,9 +54,9 @@ update msg model =
             ({ model | result = Nothing }
             , Http.request
                            { method = "POST"
-                           , headers = [(Http.header "Access-Control-Allow-Origin" "http://127.0.0.1:8080")
+                           , headers = [(Http.header "Access-Control-Allow-Origin" (model.url++"servlet"))
                                        ,(Http.header "Access-Control-Allow-Methods" "POST")]
-                           , url = "http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello"
+                           , url = model.url++"servlet"
                            , body = Http.jsonBody <|
                                     JE.object
                                     [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
@@ -79,6 +83,11 @@ update msg model =
                   { model | inputH =  h },Cmd.none
                    )
 
+        ReceivedURL url ->(
+                        { model | url =  url },Cmd.none
+                       )
+        Loading ->(model,Cmd.none)
+
 view : Model -> Html Msg
 view model =
     div []
@@ -96,7 +105,8 @@ subscriptions : Model-> Sub Msg
 subscriptions _ =Sub.batch[
     receiveN_last ReceivedN,
     receiveW ReceivedW,
-    receiveH ReceivedH
+    receiveH ReceivedH,
+    receiveUrl ReceivedURL
     ]
 
 main : Program () Model Msg

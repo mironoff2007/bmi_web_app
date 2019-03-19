@@ -4964,7 +4964,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$PostForm$init = function (_n0) {
 	return _Utils_Tuple2(
-		{inputH: '', inputN: '', inputW: '', result: elm$core$Maybe$Nothing},
+		{inputH: '', inputN: '', inputW: '', result: elm$core$Maybe$Nothing, url: ''},
 		elm$core$Platform$Cmd$none);
 };
 var author$project$PostForm$ReceivedH = function (a) {
@@ -4973,12 +4973,16 @@ var author$project$PostForm$ReceivedH = function (a) {
 var author$project$PostForm$ReceivedN = function (a) {
 	return {$: 'ReceivedN', a: a};
 };
+var author$project$PostForm$ReceivedURL = function (a) {
+	return {$: 'ReceivedURL', a: a};
+};
 var author$project$PostForm$ReceivedW = function (a) {
 	return {$: 'ReceivedW', a: a};
 };
 var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$PostForm$receiveH = _Platform_incomingPort('receiveH', elm$json$Json$Decode$string);
 var author$project$PostForm$receiveN_last = _Platform_incomingPort('receiveN_last', elm$json$Json$Decode$string);
+var author$project$PostForm$receiveUrl = _Platform_incomingPort('receiveUrl', elm$json$Json$Decode$string);
 var author$project$PostForm$receiveW = _Platform_incomingPort('receiveW', elm$json$Json$Decode$string);
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var author$project$PostForm$subscriptions = function (_n0) {
@@ -4987,7 +4991,8 @@ var author$project$PostForm$subscriptions = function (_n0) {
 			[
 				author$project$PostForm$receiveN_last(author$project$PostForm$ReceivedN),
 				author$project$PostForm$receiveW(author$project$PostForm$ReceivedW),
-				author$project$PostForm$receiveH(author$project$PostForm$ReceivedH)
+				author$project$PostForm$receiveH(author$project$PostForm$ReceivedH),
+				author$project$PostForm$receiveUrl(author$project$PostForm$ReceivedURL)
 			]));
 };
 var author$project$PostForm$GotIt = function (a) {
@@ -5933,13 +5938,13 @@ var author$project$PostForm$update = F2(
 							expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
 							headers: _List_fromArray(
 								[
-									A2(elm$http$Http$header, 'Access-Control-Allow-Origin', 'http://127.0.0.1:8080'),
+									A2(elm$http$Http$header, 'Access-Control-Allow-Origin', model.url + 'servlet'),
 									A2(elm$http$Http$header, 'Access-Control-Allow-Methods', 'POST')
 								]),
 							method: 'POST',
 							timeout: elm$core$Maybe$Nothing,
 							tracker: elm$core$Maybe$Nothing,
-							url: 'http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello'
+							url: model.url + 'servlet'
 						}));
 			case 'GotIt':
 				var result = msg.a;
@@ -5957,13 +5962,22 @@ var author$project$PostForm$update = F2(
 						model,
 						{inputW: w}),
 					elm$core$Platform$Cmd$none);
-			default:
+			case 'ReceivedH':
 				var h = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{inputH: h}),
 					elm$core$Platform$Cmd$none);
+			case 'ReceivedURL':
+				var url = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{url: url}),
+					elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
 	});
 var elm$core$Debug$toString = _Debug_toString;

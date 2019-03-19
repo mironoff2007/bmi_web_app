@@ -9,15 +9,24 @@ import com.mironov.bmi.Service.ServiceImpl;
 
 
 public class MyGuiceServletConfig extends GuiceServletContextListener {
+
     @Override
     protected Injector getInjector() {
+
+
 
         return Guice.createInjector(new ServletModule(){
             @Override
             protected void configureServlets(){
-                serve("/index.html").with(GuiceServlet.class);
+                serve("/servlet").with(GuiceServlet.class);
                 bind(Service.class).to(ServiceImpl.class);
             }
+
+
         });
     }
+
+
+
+
 }

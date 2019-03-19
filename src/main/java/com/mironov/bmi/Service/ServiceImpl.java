@@ -11,8 +11,7 @@ public class ServiceImpl implements Service {
     @Inject
     MockDAO mockDAO;
 
-    public ServiceImpl() {
-    }
+    public ServiceImpl() {}
 
     public CopyOnWriteArrayList<BmiRecord> getBmiList() {
         return mockDAO.getBmiList();

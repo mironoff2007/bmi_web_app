@@ -35,9 +35,10 @@ type State
   | Success (List Bmi)
   | GetReq String
 
+
 type Msg
   = GotBmi(Result Http.Error (List Bmi))
-  | ReceivedN String
+  | ReceivedURL String
 
 
 
@@ -46,6 +47,7 @@ type alias Model =
     , person : Bmi
     , bmis:List Bmi
     , str:String
+    , url:String
     }
 
 
@@ -78,11 +80,14 @@ init _ =
 
 
 
-port receiveData : (String -> msg) -> Sub msg
 
+port receiveUrl : (String -> msg) -> Sub msg
+
+-- SUBSCRIPTIONS
 subscriptions : State-> Sub Msg
 subscriptions state =
-    receiveData ReceivedN
+    receiveUrl ReceivedURL
+
 
 update : Msg -> State -> (State, Cmd Msg)
 update msg model =
@@ -96,12 +101,13 @@ update msg model =
 
         Err _ ->
           (Failure, Cmd.none)
-    ReceivedN str->(GetReq str, upload str)
+
+    ReceivedURL url->(GetReq url, upload url)
 
 
 
 
--- SUBSCRIPTIONS
+
 
 
 
@@ -173,11 +179,11 @@ viewBmiTable state =
 
 
 upload : String -> Cmd Msg
-upload name =
+upload url =
   Http.request
     { method = "GET"
     , headers = []
-    , url = ("http://127.0.0.1:8080/bmi_web_app_war_exploded/Hello?name="++name)
+    , url = (url++"servlet")
     , body = Http.emptyBody
     , expect = Http.expectJson GotBmi  bmiListDecoder
     , timeout = Nothing
