@@ -24,43 +24,29 @@
 <br>
 
 <button onclick="post()">Post</button>
-
+<button onclick="update()">Update</button>
 <main></main>
 <div id="postForm"></div>
 <script src="postForm.js"></script>
 <script>
 
     var app = Elm.PostForm.init({node: document.querySelector('main')})
-
+    app.ports.receiveUrl.send(window.location.href);
     function post(){
-        app.ports.receiveUrl.send(window.location.href);
         app.ports.receiveH.send(document.getElementById("inpH").value);
         app.ports.receiveW.send(document.getElementById("inpW").value);
         app.ports.receiveN_last.send(document.getElementById("inpN").value);
-
-        app2.ports.receiveUrl.send(window.location.href);
+        app.ports.receiveUrl.send(window.location.href);
     }
-    
+    function update(){
+        app.ports.receiveUrl.send(window.location.href);
+    }
 
 </script>
 
 
 
-<p><br/></p>
-<button onclick="updateT()">Update Table</button>
 
-<div id="getTable"></div>
-<script src="getTable.js"></script>
-
-<script>
-    function updateT(){
-        app2.ports.receiveUrl.send(window.location.href);
-    }
-    var app2 = Elm.GetTable.init({node: document.getElementById('getTable')})
-    app2.ports.receiveUrl.send(window.location.href);
-    // you can use ports and stuff here
-
-</script>
 
 
 
