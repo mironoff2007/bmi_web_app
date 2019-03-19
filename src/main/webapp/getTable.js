@@ -5021,20 +5021,22 @@ var author$project$GetTable$Success = function (a) {
 var author$project$GetTable$GotBmi = function (a) {
 	return {$: 'GotBmi', a: a};
 };
-var author$project$GetTable$Bmi = F3(
-	function (bmi, dateTime, weight) {
-		return {bmi: bmi, dateTime: dateTime, weight: weight};
+var author$project$GetTable$Bmi = F5(
+	function (name, bmi, dateTime, weight, height) {
+		return {bmi: bmi, dateTime: dateTime, height: height, name: name, weight: weight};
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$float = _Json_decodeFloat;
 var elm$json$Json$Decode$int = _Json_decodeInt;
-var elm$json$Json$Decode$map3 = _Json_map3;
-var author$project$GetTable$bmiDecoder = A4(
-	elm$json$Json$Decode$map3,
+var elm$json$Json$Decode$map5 = _Json_map5;
+var author$project$GetTable$bmiDecoder = A6(
+	elm$json$Json$Decode$map5,
 	author$project$GetTable$Bmi,
+	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'bmi', elm$json$Json$Decode$float),
 	A2(elm$json$Json$Decode$field, 'dateTime', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'weight', elm$json$Json$Decode$int));
+	A2(elm$json$Json$Decode$field, 'weight', elm$json$Json$Decode$int),
+	A2(elm$json$Json$Decode$field, 'height', elm$json$Json$Decode$int));
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$GetTable$bmiListDecoder = elm$json$Json$Decode$list(author$project$GetTable$bmiDecoder);
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
@@ -6428,11 +6430,21 @@ var author$project$GetTable$viewBmi = function (bmi) {
 					]),
 				_List_fromArray(
 					[
+						elm$html$Html$text(bmi.name)
+					])),
+				A2(
+				elm$html$Html$td,
+				_List_fromArray(
+					[
+						A2(elm$html$Html$Attributes$style, 'text-align', 'center')
+					]),
+				_List_fromArray(
+					[
 						elm$html$Html$text(
 						A2(
 							cuducos$elm_format_number$FormatNumber$format,
 							A7(cuducos$elm_format_number$FormatNumber$Locales$Locale, 2, ',', '.', '−', '', '', ''),
-							bmi.bmi) + '')
+							bmi.bmi))
 					])),
 				A2(
 				elm$html$Html$td,
@@ -6442,7 +6454,7 @@ var author$project$GetTable$viewBmi = function (bmi) {
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text(bmi.dateTime + '')
+						elm$html$Html$text(bmi.dateTime)
 					])),
 				A2(
 				elm$html$Html$td,
@@ -6453,7 +6465,18 @@ var author$project$GetTable$viewBmi = function (bmi) {
 				_List_fromArray(
 					[
 						elm$html$Html$text(
-						elm$core$Debug$toString(bmi.weight) + '')
+						elm$core$Debug$toString(bmi.weight))
+					])),
+				A2(
+				elm$html$Html$td,
+				_List_fromArray(
+					[
+						A2(elm$html$Html$Attributes$style, 'text-align', 'center')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						elm$core$Debug$toString(bmi.height))
 					]))
 			]));
 };
@@ -6463,6 +6486,13 @@ var author$project$GetTable$viewTableHeader = A2(
 	_List_Nil,
 	_List_fromArray(
 		[
+			A2(
+			elm$html$Html$th,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text('Name')
+				])),
 			A2(
 			elm$html$Html$th,
 			_List_Nil,
@@ -6483,6 +6513,13 @@ var author$project$GetTable$viewTableHeader = A2(
 			_List_fromArray(
 				[
 					elm$html$Html$text('Weight')
+				])),
+			A2(
+			elm$html$Html$th,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text('Height')
 				]))
 		]));
 var elm$core$List$map = F2(

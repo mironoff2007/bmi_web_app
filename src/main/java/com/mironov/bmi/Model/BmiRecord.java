@@ -58,16 +58,18 @@ public class BmiRecord {
         this.dateTime = dateTime;
     }
     */
-    public BmiRecord(String name, float height, int weight) {
+    public BmiRecord(String name, int height, int weight) {
 
         this.weight = weight;
 
         formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd  HH:mm:ss");
         this.dateTime=LocalDateTime.now().format(formatter);
 
-        this.bmi=weight/height/height*1000;
+        this.bmi= (float) (1000.0*weight/height/height);
 
         this.name=name;
+
+        this.height=height;
     }
 
 

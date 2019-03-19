@@ -3,12 +3,12 @@ port module GetTable exposing (main)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+
 import Http
 import Json.Decode as D
-import Json.Encode as JE
+
 import Json.Decode exposing (Decoder, field, string)
-import Json.Decode exposing (Decoder, float, int, map3, string)
+import Json.Decode exposing (Decoder, float, int, map5, string)
 import FormatNumber.Locales exposing (Locale)
 
 import FormatNumber exposing (format)
@@ -52,17 +52,22 @@ type alias Model =
 
 
 type alias Bmi = {
+    name:String,
     bmi : Float,
     dateTime : String,
-    weight : Int
+    weight : Int,
+    height : Int
     }
 
 bmiDecoder : Decoder Bmi
 bmiDecoder =
-  map3 Bmi
+  map5 Bmi
+    (field "name" string)
     (field "bmi" float)
     (field "dateTime" string)
     (field "weight"  int)
+    (field "height"  int)
+
 
 
 bmiListDecoder : Decoder (List Bmi)
@@ -75,12 +80,6 @@ init _ =
 
 
 
--- UPDATE
-
-
-
-
-
 port receiveUrl : (String -> msg) -> Sub msg
 
 -- SUBSCRIPTIONS
@@ -88,7 +87,7 @@ subscriptions : State-> Sub Msg
 subscriptions state =
     receiveUrl ReceivedURL
 
-
+-- UPDATE
 update : Msg -> State -> (State, Cmd Msg)
 update msg model =
   case msg of
@@ -106,25 +105,22 @@ update msg model =
 
 
 
-
-
-
-
-
-
-
-
 -- VIEW
 
 viewTableHeader : Html Msg
 viewTableHeader =
     tr []
-        [ th []
-            [ text "BMI" ]
+        [
+          th []
+           [ text "Name" ]
         , th []
-            [ text "Date Time" ]
+           [ text "BMI" ]
         , th []
-            [ text "Weight" ]
+           [ text "Date Time" ]
+        , th []
+           [ text "Weight" ]
+        , th []
+           [ text "Height" ]
         ]
 
 view : State -> Html Msg
@@ -139,12 +135,16 @@ view state =
 viewBmi :  Bmi -> Html Msg
 viewBmi bmi =
     tr []
-        [ td [Html.Attributes.style "text-align" "center" ]
-            [ text ( (format (Locale 2 "," "." "−" "" "" "") bmi.bmi)++"") ]
-        , td [Html.Attributes.style "text-align" "center" ]
-            [ text (bmi.dateTime ++ "")]
-        , td [Html.Attributes.style "text-align" "center" ]
-            [ text (Debug.toString  bmi.weight++"") ]
+        [td [Html.Attributes.style "text-align" "center" ]
+            [ text   bmi.name ]
+        ,td [Html.Attributes.style "text-align" "center" ]
+            [ text ( (format (Locale 2 "," "." "−" "" "" "") bmi.bmi)) ]
+        ,td [Html.Attributes.style "text-align" "center" ]
+            [ text (bmi.dateTime )]
+        ,td [Html.Attributes.style "text-align" "center" ]
+            [ text (Debug.toString  bmi.weight) ]
+        ,td [Html.Attributes.style "text-align" "center" ]
+            [ text (Debug.toString  bmi.height) ]
         ]
 
 viewBmis : List Bmi -> Html Msg
