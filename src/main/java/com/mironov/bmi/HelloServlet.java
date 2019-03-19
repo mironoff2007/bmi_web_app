@@ -29,8 +29,8 @@ public class HelloServlet extends HttpServlet {
     }
 
     public HelloServlet(){
-        Injector injector= Guice.createInjector(new ServiceModule());
-        service= injector.getInstance(Service.class);
+        //Injector injector= Guice.createInjector(new ServiceModule());
+       // service= injector.getInstance(Service.class);
 
         service.saveBmi("Vasja",178,65);
         service.saveBmi("Vasja",178,68);
