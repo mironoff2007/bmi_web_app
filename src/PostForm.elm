@@ -63,7 +63,6 @@ type Msg
     | ReceivedW String
     | ReceivedH String
     | ReceivedURL String
-    | Loading
 
 port receiveN_last : (String -> msg) -> Sub msg
 port receiveW : (String -> msg) -> Sub msg
@@ -77,34 +76,15 @@ userDecoder =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-    ReceivedN name ->
-        ({ model | result = Nothing }
-            , Http.request
-            { method = "POST"
-                , headers = [(Http.header "Access-Control-Allow-Origin" (model.url++"servlet"))
-                ,(Http.header "Access-Control-Allow-Methods" "POST")]
-                , url = model.url++"servlet"
-                , body = Http.jsonBody <|
-                   JE.object
-                    [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
-                    ,("height",JE.int (String.toInt model.inputH|> Maybe.withDefault 0))
-                    ,("name", JE.string (name))
-                    ]
-                , expect = Http.expectWhatever GotIt
-                , timeout = Nothing
-                , tracker = Nothing
-            }
-         )
+    ReceivedN name ->({ model | inputN = name }, post (model,name))
 
-    GotIt result -> ({ model | result = Just result },Cmd.none)
+    GotIt result -> ({ model | result = Just result },upload model.url)
 
     ReceivedW w ->({ model | inputW = w },Cmd.none)
 
     ReceivedH h ->({ model | inputH = h },Cmd.none)
 
     ReceivedURL url ->({ model | url = url },upload model.url)
-
-    Loading ->(model,Cmd.none)
 
     GotBmi result ->
         case result of
@@ -198,3 +178,20 @@ upload url =
     , timeout = Nothing
     , tracker = Nothing
     }
+
+post : (Model, String)-> Cmd Msg
+post  (model,name)  =  Http.request
+                { method = "POST"
+                    , headers = [(Http.header "Access-Control-Allow-Origin" (model.url++"servlet"))
+                    ,(Http.header "Access-Control-Allow-Methods" "POST")]
+                    , url = model.url++"servlet"
+                    , body = Http.jsonBody <|
+                       JE.object
+                        [("weight", JE.int (String.toInt model.inputW|> Maybe.withDefault 0) )
+                        ,("height",JE.int (String.toInt model.inputH|> Maybe.withDefault 0))
+                        ,("name", JE.string (name))
+                        ]
+                    , expect = Http.expectWhatever GotIt
+                    , timeout = Nothing
+                    , tracker = Nothing
+                }

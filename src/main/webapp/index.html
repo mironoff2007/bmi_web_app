@@ -36,10 +36,6 @@
         app.ports.receiveH.send(document.getElementById("inpH").value);
         app.ports.receiveW.send(document.getElementById("inpW").value);
         app.ports.receiveN_last.send(document.getElementById("inpN").value);
-        setTimeout(function(){
-            app.ports.receiveUrl.send(window.location.href);
-        }, 500);
-
     }
 
 </script>

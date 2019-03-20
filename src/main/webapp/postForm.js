@@ -5035,27 +5035,21 @@ var author$project$PostForm$subscriptions = function (_n0) {
 var author$project$PostForm$GotIt = function (a) {
 	return {$: 'GotIt', a: a};
 };
-var author$project$PostForm$GotBmi = function (a) {
-	return {$: 'GotBmi', a: a};
-};
-var author$project$PostForm$Bmi = F5(
-	function (name, bmi, dateTime, weight, height) {
-		return {bmi: bmi, dateTime: dateTime, height: height, name: name, weight: weight};
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
-var elm$json$Json$Decode$field = _Json_decodeField;
-var elm$json$Json$Decode$float = _Json_decodeFloat;
-var elm$json$Json$Decode$int = _Json_decodeInt;
-var elm$json$Json$Decode$map5 = _Json_map5;
-var author$project$PostForm$bmiDecoder = A6(
-	elm$json$Json$Decode$map5,
-	author$project$PostForm$Bmi,
-	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'bmi', elm$json$Json$Decode$float),
-	A2(elm$json$Json$Decode$field, 'dateTime', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'weight', elm$json$Json$Decode$int),
-	A2(elm$json$Json$Decode$field, 'height', elm$json$Json$Decode$int));
-var elm$json$Json$Decode$list = _Json_decodeList;
-var author$project$PostForm$bmiListDecoder = elm$json$Json$Decode$list(author$project$PostForm$bmiDecoder);
+var elm$core$String$toInt = _String_toInt;
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Basics$compare = _Utils_compare;
@@ -5610,7 +5604,14 @@ var elm$http$Http$Sending = function (a) {
 	return {$: 'Sending', a: a};
 };
 var elm$http$Http$Timeout_ = {$: 'Timeout_'};
-var elm$http$Http$emptyBody = _Http_emptyBody;
+var elm$http$Http$expectBytesResponse = F2(
+	function (toMsg, toResult) {
+		return A3(
+			_Http_expect,
+			'arraybuffer',
+			_Http_toDataView,
+			A2(elm$core$Basics$composeR, toResult, toMsg));
+	});
 var elm$core$Result$mapError = F2(
 	function (f, result) {
 		if (result.$ === 'Ok') {
@@ -5621,22 +5622,6 @@ var elm$core$Result$mapError = F2(
 			return elm$core$Result$Err(
 				f(e));
 		}
-	});
-var elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
-var elm$http$Http$expectStringResponse = F2(
-	function (toMsg, toResult) {
-		return A3(
-			_Http_expect,
-			'',
-			elm$core$Basics$identity,
-			A2(elm$core$Basics$composeR, toResult, toMsg));
 	});
 var elm$http$Http$BadBody = function (a) {
 	return {$: 'BadBody', a: a};
@@ -5672,20 +5657,26 @@ var elm$http$Http$resolve = F2(
 					toResult(body));
 		}
 	});
-var elm$json$Json$Decode$decodeString = _Json_runOnString;
-var elm$http$Http$expectJson = F2(
-	function (toMsg, decoder) {
-		return A2(
-			elm$http$Http$expectStringResponse,
-			toMsg,
-			elm$http$Http$resolve(
-				function (string) {
-					return A2(
-						elm$core$Result$mapError,
-						elm$json$Json$Decode$errorToString,
-						A2(elm$json$Json$Decode$decodeString, decoder, string));
-				}));
+var elm$http$Http$expectWhatever = function (toMsg) {
+	return A2(
+		elm$http$Http$expectBytesResponse,
+		toMsg,
+		elm$http$Http$resolve(
+			function (_n0) {
+				return elm$core$Result$Ok(_Utils_Tuple0);
+			}));
+};
+var elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
 	});
+var elm$http$Http$header = elm$http$Http$Header;
+var elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2(elm$json$Json$Encode$encode, 0, value));
+};
 var elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -5933,56 +5924,6 @@ var elm$http$Http$request = function (r) {
 		elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var author$project$PostForm$upload = function (url) {
-	return elm$http$Http$request(
-		{
-			body: elm$http$Http$emptyBody,
-			expect: A2(elm$http$Http$expectJson, author$project$PostForm$GotBmi, author$project$PostForm$bmiListDecoder),
-			headers: _List_Nil,
-			method: 'GET',
-			timeout: elm$core$Maybe$Nothing,
-			tracker: elm$core$Maybe$Nothing,
-			url: url + 'servlet'
-		});
-};
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var elm$core$String$toInt = _String_toInt;
-var elm$http$Http$expectBytesResponse = F2(
-	function (toMsg, toResult) {
-		return A3(
-			_Http_expect,
-			'arraybuffer',
-			_Http_toDataView,
-			A2(elm$core$Basics$composeR, toResult, toMsg));
-	});
-var elm$http$Http$expectWhatever = function (toMsg) {
-	return A2(
-		elm$http$Http$expectBytesResponse,
-		toMsg,
-		elm$http$Http$resolve(
-			function (_n0) {
-				return elm$core$Result$Ok(_Utils_Tuple0);
-			}));
-};
-var elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 'Header', a: a, b: b};
-	});
-var elm$http$Http$header = elm$http$Http$Header;
-var elm$http$Http$jsonBody = function (value) {
-	return A2(
-		_Http_pair,
-		'application/json',
-		A2(elm$json$Json$Encode$encode, 0, value));
-};
 var elm$json$Json$Encode$int = _Json_wrap;
 var elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5998,6 +5939,104 @@ var elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var elm$json$Json$Encode$string = _Json_wrap;
+var author$project$PostForm$post = function (_n0) {
+	var model = _n0.a;
+	var name = _n0.b;
+	return elm$http$Http$request(
+		{
+			body: elm$http$Http$jsonBody(
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'weight',
+							elm$json$Json$Encode$int(
+								A2(
+									elm$core$Maybe$withDefault,
+									0,
+									elm$core$String$toInt(model.inputW)))),
+							_Utils_Tuple2(
+							'height',
+							elm$json$Json$Encode$int(
+								A2(
+									elm$core$Maybe$withDefault,
+									0,
+									elm$core$String$toInt(model.inputH)))),
+							_Utils_Tuple2(
+							'name',
+							elm$json$Json$Encode$string(name))
+						]))),
+			expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
+			headers: _List_fromArray(
+				[
+					A2(elm$http$Http$header, 'Access-Control-Allow-Origin', model.url + 'servlet'),
+					A2(elm$http$Http$header, 'Access-Control-Allow-Methods', 'POST')
+				]),
+			method: 'POST',
+			timeout: elm$core$Maybe$Nothing,
+			tracker: elm$core$Maybe$Nothing,
+			url: model.url + 'servlet'
+		});
+};
+var author$project$PostForm$GotBmi = function (a) {
+	return {$: 'GotBmi', a: a};
+};
+var author$project$PostForm$Bmi = F5(
+	function (name, bmi, dateTime, weight, height) {
+		return {bmi: bmi, dateTime: dateTime, height: height, name: name, weight: weight};
+	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$float = _Json_decodeFloat;
+var elm$json$Json$Decode$int = _Json_decodeInt;
+var elm$json$Json$Decode$map5 = _Json_map5;
+var author$project$PostForm$bmiDecoder = A6(
+	elm$json$Json$Decode$map5,
+	author$project$PostForm$Bmi,
+	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'bmi', elm$json$Json$Decode$float),
+	A2(elm$json$Json$Decode$field, 'dateTime', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'weight', elm$json$Json$Decode$int),
+	A2(elm$json$Json$Decode$field, 'height', elm$json$Json$Decode$int));
+var elm$json$Json$Decode$list = _Json_decodeList;
+var author$project$PostForm$bmiListDecoder = elm$json$Json$Decode$list(author$project$PostForm$bmiDecoder);
+var elm$http$Http$emptyBody = _Http_emptyBody;
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var elm$http$Http$expectStringResponse = F2(
+	function (toMsg, toResult) {
+		return A3(
+			_Http_expect,
+			'',
+			elm$core$Basics$identity,
+			A2(elm$core$Basics$composeR, toResult, toMsg));
+	});
+var elm$json$Json$Decode$decodeString = _Json_runOnString;
+var elm$http$Http$expectJson = F2(
+	function (toMsg, decoder) {
+		return A2(
+			elm$http$Http$expectStringResponse,
+			toMsg,
+			elm$http$Http$resolve(
+				function (string) {
+					return A2(
+						elm$core$Result$mapError,
+						elm$json$Json$Decode$errorToString,
+						A2(elm$json$Json$Decode$decodeString, decoder, string));
+				}));
+	});
+var author$project$PostForm$upload = function (url) {
+	return elm$http$Http$request(
+		{
+			body: elm$http$Http$emptyBody,
+			expect: A2(elm$http$Http$expectJson, author$project$PostForm$GotBmi, author$project$PostForm$bmiListDecoder),
+			headers: _List_Nil,
+			method: 'GET',
+			timeout: elm$core$Maybe$Nothing,
+			tracker: elm$core$Maybe$Nothing,
+			url: url + 'servlet'
+		});
+};
 var author$project$PostForm$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6006,42 +6045,9 @@ var author$project$PostForm$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{result: elm$core$Maybe$Nothing}),
-					elm$http$Http$request(
-						{
-							body: elm$http$Http$jsonBody(
-								elm$json$Json$Encode$object(
-									_List_fromArray(
-										[
-											_Utils_Tuple2(
-											'weight',
-											elm$json$Json$Encode$int(
-												A2(
-													elm$core$Maybe$withDefault,
-													0,
-													elm$core$String$toInt(model.inputW)))),
-											_Utils_Tuple2(
-											'height',
-											elm$json$Json$Encode$int(
-												A2(
-													elm$core$Maybe$withDefault,
-													0,
-													elm$core$String$toInt(model.inputH)))),
-											_Utils_Tuple2(
-											'name',
-											elm$json$Json$Encode$string(name))
-										]))),
-							expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
-							headers: _List_fromArray(
-								[
-									A2(elm$http$Http$header, 'Access-Control-Allow-Origin', model.url + 'servlet'),
-									A2(elm$http$Http$header, 'Access-Control-Allow-Methods', 'POST')
-								]),
-							method: 'POST',
-							timeout: elm$core$Maybe$Nothing,
-							tracker: elm$core$Maybe$Nothing,
-							url: model.url + 'servlet'
-						}));
+						{inputN: name}),
+					author$project$PostForm$post(
+						_Utils_Tuple2(model, name)));
 			case 'GotIt':
 				var result = msg.a;
 				return _Utils_Tuple2(
@@ -6050,7 +6056,7 @@ var author$project$PostForm$update = F2(
 						{
 							result: elm$core$Maybe$Just(result)
 						}),
-					elm$core$Platform$Cmd$none);
+					author$project$PostForm$upload(model.url));
 			case 'ReceivedW':
 				var w = msg.a;
 				return _Utils_Tuple2(
@@ -6072,8 +6078,6 @@ var author$project$PostForm$update = F2(
 						model,
 						{url: url}),
 					author$project$PostForm$upload(model.url));
-			case 'Loading':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			default:
 				var result = msg.a;
 				if (result.$ === 'Ok') {
@@ -6622,35 +6626,35 @@ var author$project$PostForm$viewTableHeader = A2(
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text('Name')
+					elm$html$Html$text(' Name ')
 				])),
 			A2(
 			elm$html$Html$th,
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text('BMI')
+					elm$html$Html$text(' BMI ')
 				])),
 			A2(
 			elm$html$Html$th,
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text('Date Time')
+					elm$html$Html$text(' Date Time ')
 				])),
 			A2(
 			elm$html$Html$th,
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text('Weight')
+					elm$html$Html$text(' Weight ')
 				])),
 			A2(
 			elm$html$Html$th,
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text('Height')
+					elm$html$Html$text(' Height ')
 				]))
 		]));
 var elm$core$List$map = F2(

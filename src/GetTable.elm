@@ -1,4 +1,4 @@
-port module GetTable exposing (main)
+port module GetTable exposing (Msg,main,upload,State)
 
 import Browser
 import Html exposing (..)
@@ -189,6 +189,7 @@ upload url =
     , timeout = Nothing
     , tracker = Nothing
     }
+
 
 
 
