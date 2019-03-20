@@ -32,12 +32,6 @@ type alias Bmi = {
     height : Int
     }
 
-type alias User =
-    { weight : Int
-    , height : Int
-    , name : String
-    }
-
 bmiDecoder : Decoder Bmi
 bmiDecoder =
     map5 Bmi
@@ -69,9 +63,6 @@ port receiveW : (String -> msg) -> Sub msg
 port receiveH : (String -> msg) -> Sub msg
 port receiveUrl : (String -> msg) -> Sub msg
 
-userDecoder : JD.Decoder User
-userDecoder =
-        JD.map3 User (JD.field "weight" JD.int) (JD.field "height" JD.int) (JD.field "name" JD.string)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -182,8 +173,7 @@ upload url =
 post : (Model, String)-> Cmd Msg
 post  (model,name)  =  Http.request
                 { method = "POST"
-                    , headers = [(Http.header "Access-Control-Allow-Origin" (model.url++"servlet"))
-                    ,(Http.header "Access-Control-Allow-Methods" "POST")]
+                    , headers = []
                     , url = model.url++"servlet"
                     , body = Http.jsonBody <|
                        JE.object
