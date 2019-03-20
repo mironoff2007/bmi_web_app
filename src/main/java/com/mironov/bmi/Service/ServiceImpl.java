@@ -2,6 +2,7 @@ package com.mironov.bmi.Service;
 
 import com.mironov.bmi.DAO.MockDAO;
 import com.mironov.bmi.Model.BmiRecord;
+import com.mironov.bmi.WrongNumberException;
 
 import javax.inject.Inject;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,8 +18,16 @@ public class ServiceImpl implements Service {
         return mockDAO.getBmiList();
     }
 
-    public void saveBmi(String name,int height, int weight){
-        mockDAO.addBmiRecord(name, height, weight);
+    public void saveBmi(String name,int height, int weight) throws WrongNumberException {
+        if(weight<=0){
+            throw new WrongNumberException("Wrong number");
+        }
+        else if(height<=0){
+            throw new WrongNumberException("Wrong number");
+        }
+        else {
+            mockDAO.addBmiRecord(name, height, weight);
+        }
     }
 
 

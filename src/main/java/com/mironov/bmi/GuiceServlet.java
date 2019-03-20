@@ -32,8 +32,13 @@ public class GuiceServlet extends HttpServlet {
         Injector injector= Guice.createInjector(new MyModule());
         service= injector.getInstance(Service.class);
 
-        service.saveBmi("Vasja",178,65);
-        service.saveBmi("Petja",170,68);
+        try {
+            service.saveBmi("Vasja",178,65);
+            service.saveBmi("Petja",170,68);
+        } catch (WrongNumberException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -56,12 +61,14 @@ public class GuiceServlet extends HttpServlet {
 
         //get fields and check
         JsonObject obj=gson.fromJson(body,JsonObject.class);
-        if(obj.weight>0&&obj.height>0) {
+
+        try {
             service.saveBmi(obj.name, obj.height, obj.weight);
-        }
-        else {
+        } catch (WrongNumberException e) {
             response.setStatus(415);
         }
+
+
     }
 
     public static String getBody(HttpServletRequest request) throws IOException {
