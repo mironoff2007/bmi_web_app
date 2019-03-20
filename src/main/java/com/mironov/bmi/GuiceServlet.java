@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class GuiceServlet extends HttpServlet {
- Service service;
+
+    private Service service;
 
     private Gson gson = new Gson();
 
@@ -42,7 +43,7 @@ public class GuiceServlet extends HttpServlet {
 
     }
 
-    //Returns List of Json object with fields - bmi:float,weight:int,name:string,height:int,dateTime:string
+    //Returns List of Json object with fields - bmi:float,weight:int[kg],name:string,height:int[cm],dateTime:string
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String jsonString = gson.toJson(service.getBmiList());
@@ -51,7 +52,7 @@ public class GuiceServlet extends HttpServlet {
         System.out.println(jsonString);
     }
 
-    //Requires json Object with fields - name:string,weight:int,height:int
+    //Requires json Object with fields - name:string,weight:int[kg],height:int[cm]
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -59,9 +60,10 @@ public class GuiceServlet extends HttpServlet {
         String body=getBody(request);
         System.out.println(body);
 
-        //get fields and check
+        //get fields
         JsonObject obj=gson.fromJson(body,JsonObject.class);
 
+        //add bmi and check
         try {
             service.saveBmi(obj.name, obj.height, obj.weight);
         } catch (WrongNumberException e) {
@@ -71,7 +73,7 @@ public class GuiceServlet extends HttpServlet {
 
     }
 
-    public static String getBody(HttpServletRequest request) throws IOException {
+    private static String getBody(HttpServletRequest request) throws IOException {
         return request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
     }
 

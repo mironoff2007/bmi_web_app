@@ -7,31 +7,19 @@ public class BmiRecord {
 
     private float bmi;
 
+    //dimension is kg
     private int weight;
+
+    //dimention is centimeter
+    private int height;
 
     private String name;
 
-    private int height;
-
     private String dateTime;
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    DateTimeFormatter formatter;
+    private DateTimeFormatter formatter;
 
     public float getBmi() {
         return bmi;
@@ -41,23 +29,7 @@ public class BmiRecord {
         this.bmi = bmi;
     }
 
-    public int getWeight() {
-        return weight;
-    }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    /*
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    //public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-    */
     public BmiRecord(String name, int height, int weight) {
 
         this.weight = weight;
