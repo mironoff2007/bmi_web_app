@@ -5004,36 +5004,16 @@ var author$project$PostForm$init = function (_n0) {
 		{bmis: _List_Nil, inputH: '', inputN: '', inputW: '', result: elm$core$Maybe$Nothing, url: ''},
 		elm$core$Platform$Cmd$none);
 };
-var author$project$PostForm$ReceivedH = function (a) {
-	return {$: 'ReceivedH', a: a};
-};
-var author$project$PostForm$ReceivedN = function (a) {
-	return {$: 'ReceivedN', a: a};
-};
 var author$project$PostForm$ReceivedURL = function (a) {
 	return {$: 'ReceivedURL', a: a};
 };
-var author$project$PostForm$ReceivedW = function (a) {
-	return {$: 'ReceivedW', a: a};
-};
 var elm$json$Json$Decode$string = _Json_decodeString;
-var author$project$PostForm$receiveH = _Platform_incomingPort('receiveH', elm$json$Json$Decode$string);
-var author$project$PostForm$receiveN_last = _Platform_incomingPort('receiveN_last', elm$json$Json$Decode$string);
 var author$project$PostForm$receiveUrl = _Platform_incomingPort('receiveUrl', elm$json$Json$Decode$string);
-var author$project$PostForm$receiveW = _Platform_incomingPort('receiveW', elm$json$Json$Decode$string);
-var elm$core$Platform$Sub$batch = _Platform_batch;
 var author$project$PostForm$subscriptions = function (_n0) {
-	return elm$core$Platform$Sub$batch(
-		_List_fromArray(
-			[
-				author$project$PostForm$receiveN_last(author$project$PostForm$ReceivedN),
-				author$project$PostForm$receiveW(author$project$PostForm$ReceivedW),
-				author$project$PostForm$receiveH(author$project$PostForm$ReceivedH),
-				author$project$PostForm$receiveUrl(author$project$PostForm$ReceivedURL)
-			]));
+	return author$project$PostForm$receiveUrl(author$project$PostForm$ReceivedURL);
 };
-var author$project$PostForm$GotIt = function (a) {
-	return {$: 'GotIt', a: a};
+var author$project$PostForm$PostResult = function (a) {
+	return {$: 'PostResult', a: a};
 };
 var elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
@@ -5934,9 +5914,7 @@ var elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var elm$json$Json$Encode$string = _Json_wrap;
-var author$project$PostForm$post = function (_n0) {
-	var model = _n0.a;
-	var name = _n0.b;
+var author$project$PostForm$post = function (model) {
 	return elm$http$Http$request(
 		{
 			body: elm$http$Http$jsonBody(
@@ -5959,9 +5937,9 @@ var author$project$PostForm$post = function (_n0) {
 									elm$core$String$toInt(model.inputH)))),
 							_Utils_Tuple2(
 							'name',
-							elm$json$Json$Encode$string(name))
+							elm$json$Json$Encode$string(model.inputN))
 						]))),
-			expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
+			expect: elm$http$Http$expectWhatever(author$project$PostForm$PostResult),
 			headers: _List_Nil,
 			method: 'POST',
 			timeout: elm$core$Maybe$Nothing,
@@ -6031,31 +6009,21 @@ var author$project$PostForm$upload = function (url) {
 var author$project$PostForm$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'ReceivedN':
+			case 'GetInputN':
 				var name = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{inputN: name}),
-					author$project$PostForm$post(
-						_Utils_Tuple2(model, name)));
-			case 'GotIt':
-				var result = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							result: elm$core$Maybe$Just(result)
-						}),
-					author$project$PostForm$upload(model.url));
-			case 'ReceivedW':
+					elm$core$Platform$Cmd$none);
+			case 'GetInputW':
 				var w = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{inputW: w}),
 					elm$core$Platform$Cmd$none);
-			case 'ReceivedH':
+			case 'GetInputH':
 				var h = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6069,7 +6037,16 @@ var author$project$PostForm$update = F2(
 						model,
 						{url: url}),
 					author$project$PostForm$upload(model.url));
-			default:
+			case 'PostResult':
+				var result = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							result: elm$core$Maybe$Just(result)
+						}),
+					author$project$PostForm$upload(model.url));
+			case 'GotBmi':
 				var result = msg.a;
 				if (result.$ === 'Ok') {
 					var bmis = result.a;
@@ -6081,8 +6058,24 @@ var author$project$PostForm$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{result: elm$core$Maybe$Nothing}),
+					author$project$PostForm$post(model));
 		}
 	});
+var author$project$PostForm$GetInputH = function (a) {
+	return {$: 'GetInputH', a: a};
+};
+var author$project$PostForm$GetInputN = function (a) {
+	return {$: 'GetInputN', a: a};
+};
+var author$project$PostForm$GetInputW = function (a) {
+	return {$: 'GetInputW', a: a};
+};
+var author$project$PostForm$PostIt = {$: 'PostIt'};
 var author$project$PostForm$addZero = function (_int) {
 	return (_int < 10) ? ('0' + elm$core$String$fromInt(_int)) : elm$core$String$fromInt(_int);
 };
@@ -6878,6 +6871,66 @@ var author$project$PostForm$viewBmis = function (bmis) {
 					A2(elm$core$List$map, author$project$PostForm$viewBmi, bmis)))
 			]));
 };
+var elm$html$Html$br = _VirtualDom_node('br');
+var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$input = _VirtualDom_node('input');
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
 var author$project$PostForm$view = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -6885,14 +6938,49 @@ var author$project$PostForm$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$div,
-				_List_Nil,
+				elm$html$Html$input,
 				_List_fromArray(
 					[
-						elm$html$Html$text(
-						(elm$core$Debug$toString(model.result) === 'Just (Err (BadStatus 415))') ? ('Response: ' + 'wrong number') : ((elm$core$Debug$toString(model.result) === 'Nothing') ? '' : ((elm$core$Debug$toString(model.result) === 'Just (Ok ())') ? 'Ok' : elm$core$Debug$toString(model.result)))),
-						author$project$PostForm$viewBmis(model.bmis)
-					]))
+						elm$html$Html$Attributes$placeholder('Name'),
+						elm$html$Html$Attributes$value(model.inputN),
+						elm$html$Html$Events$onInput(author$project$PostForm$GetInputN)
+					]),
+				_List_Nil),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$placeholder('Weight'),
+						elm$html$Html$Attributes$value(model.inputW),
+						elm$html$Html$Events$onInput(author$project$PostForm$GetInputW)
+					]),
+				_List_Nil),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$placeholder('Height'),
+						elm$html$Html$Attributes$value(model.inputH),
+						elm$html$Html$Events$onInput(author$project$PostForm$GetInputH)
+					]),
+				_List_Nil),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(author$project$PostForm$PostIt)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('POST')
+					])),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
+				elm$html$Html$text(
+				(elm$core$Debug$toString(model.result) === 'Just (Err (BadStatus 415))') ? ('Response: ' + 'wrong number') : ((elm$core$Debug$toString(model.result) === 'Nothing') ? '' : ((elm$core$Debug$toString(model.result) === 'Just (Ok ())') ? 'Ok' : elm$core$Debug$toString(model.result)))),
+				author$project$PostForm$viewBmis(model.bmis)
 			]));
 };
 var elm$browser$Browser$External = function (a) {
