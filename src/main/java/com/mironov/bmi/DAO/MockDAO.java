@@ -4,26 +4,9 @@ import com.mironov.bmi.Model.BmiRecord;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+public interface MockDAO {
 
-public class MockDAO {
+    public CopyOnWriteArrayList<BmiRecord> getBmiList() ;
 
-
-    private CopyOnWriteArrayList<BmiRecord> bmiList;
-
-
-
-    public MockDAO() {
-        bmiList = new CopyOnWriteArrayList<>();
-    }
-
-    public CopyOnWriteArrayList<BmiRecord> getBmiList() {
-        return bmiList;
-    }
-
-    public void addBmiRecord(String name, int height, int weight){
-            bmiList.add(new BmiRecord(name, height,weight));
-    }
-
-
-
+    public void addBmiRecord(String name, int height, int weight);
 }
