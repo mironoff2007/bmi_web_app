@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Http
 import Json.Encode as JE
 import Json.Decode as JD exposing (Decoder)
-
+import Json.Decode as Decode
 import Http
 import Json.Decode as D
 
@@ -15,6 +15,8 @@ import Json.Decode exposing (Decoder, float, int, map5, string)
 import FormatNumber.Locales exposing (Locale)
 
 import FormatNumber exposing (format)
+import Time exposing (Month(..), toDay, toHour, toMinute, toMonth, toSecond, toYear, utc)
+import Time
 
 type alias Model =
     { result : Maybe (Result Http.Error ())
@@ -27,7 +29,7 @@ type alias Model =
 type alias Bmi = {
     name:String,
     bmi : Float,
-    dateTime : String,
+    dateTimeStep : Int,
     weight : Int,
     height : Int
     }
@@ -37,13 +39,50 @@ bmiDecoder =
     map5 Bmi
         (field "name" string)
         (field "bmi" float)
-        (field "dateTime" string)
+        (field "dateTimeStep" int)
         (field "weight" int)
         (field "height" int)
 
 bmiListDecoder : Decoder (List Bmi)
 bmiListDecoder =
     D.list bmiDecoder
+
+--Month to Int decoder
+toIntMonth : Month -> String
+toIntMonth month =
+  case month of
+    Jan -> "1"
+    Feb -> "2"
+    Mar -> "3"
+    Apr -> "4"
+    May -> "5"
+    Jun -> "6"
+    Jul -> "7"
+    Aug -> "8"
+    Sep -> "9"
+    Oct -> "10"
+    Nov -> "11"
+    Dec -> "12"
+
+--Date Time to String converter
+toUtcString : Time.Posix -> String
+toUtcString time =
+  String.fromInt (toHour utc time)
+  ++ ":" ++
+  addZero (toMinute utc time)
+  ++ ":" ++
+  addZero (toSecond utc time)
+  ++ " | " ++
+  String.fromInt (toDay utc time)
+  ++ "/" ++
+  (toIntMonth (toMonth utc time))
+   ++ "/" ++
+  String.fromInt (toYear utc time)
+
+--add zero before number
+addZero : Int -> String
+addZero int =if int<10 then ("0"++String.fromInt(int))else String.fromInt(int)
+
 
 init : () -> (Model, Cmd Msg)
 init () =
@@ -126,7 +165,7 @@ viewBmi bmi =
     ,td [Html.Attributes.style "text-align" "center" ]
     [ text ( (format (Locale 2 "," "." "−" "" "" "") bmi.bmi)) ]
     ,td [Html.Attributes.style "text-align" "center" ]
-    [ text (bmi.dateTime )]
+    [ text (toUtcString( bmi.dateTimeStep|>Time.millisToPosix))]
     ,td [Html.Attributes.style "text-align" "center" ]
     [ text (Debug.toString bmi.weight) ]
     ,td [Html.Attributes.style "text-align" "center" ]

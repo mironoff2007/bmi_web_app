@@ -5666,11 +5666,6 @@ var elm$http$Http$expectWhatever = function (toMsg) {
 				return elm$core$Result$Ok(_Utils_Tuple0);
 			}));
 };
-var elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 'Header', a: a, b: b};
-	});
-var elm$http$Http$header = elm$http$Http$Header;
 var elm$http$Http$jsonBody = function (value) {
 	return A2(
 		_Http_pair,
@@ -5967,11 +5962,7 @@ var author$project$PostForm$post = function (_n0) {
 							elm$json$Json$Encode$string(name))
 						]))),
 			expect: elm$http$Http$expectWhatever(author$project$PostForm$GotIt),
-			headers: _List_fromArray(
-				[
-					A2(elm$http$Http$header, 'Access-Control-Allow-Origin', model.url + 'servlet'),
-					A2(elm$http$Http$header, 'Access-Control-Allow-Methods', 'POST')
-				]),
+			headers: _List_Nil,
 			method: 'POST',
 			timeout: elm$core$Maybe$Nothing,
 			tracker: elm$core$Maybe$Nothing,
@@ -5982,8 +5973,8 @@ var author$project$PostForm$GotBmi = function (a) {
 	return {$: 'GotBmi', a: a};
 };
 var author$project$PostForm$Bmi = F5(
-	function (name, bmi, dateTime, weight, height) {
-		return {bmi: bmi, dateTime: dateTime, height: height, name: name, weight: weight};
+	function (name, bmi, dateTimeStep, weight, height) {
+		return {bmi: bmi, dateTimeStep: dateTimeStep, height: height, name: name, weight: weight};
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$float = _Json_decodeFloat;
@@ -5994,7 +5985,7 @@ var author$project$PostForm$bmiDecoder = A6(
 	author$project$PostForm$Bmi,
 	A2(elm$json$Json$Decode$field, 'name', elm$json$Json$Decode$string),
 	A2(elm$json$Json$Decode$field, 'bmi', elm$json$Json$Decode$float),
-	A2(elm$json$Json$Decode$field, 'dateTime', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'dateTimeStep', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'weight', elm$json$Json$Decode$int),
 	A2(elm$json$Json$Decode$field, 'height', elm$json$Json$Decode$int));
 var elm$json$Json$Decode$list = _Json_decodeList;
@@ -6092,6 +6083,195 @@ var author$project$PostForm$update = F2(
 				}
 		}
 	});
+var author$project$PostForm$addZero = function (_int) {
+	return (_int < 10) ? ('0' + elm$core$String$fromInt(_int)) : elm$core$String$fromInt(_int);
+};
+var author$project$PostForm$toIntMonth = function (month) {
+	switch (month.$) {
+		case 'Jan':
+			return '1';
+		case 'Feb':
+			return '2';
+		case 'Mar':
+			return '3';
+		case 'Apr':
+			return '4';
+		case 'May':
+			return '5';
+		case 'Jun':
+			return '6';
+		case 'Jul':
+			return '7';
+		case 'Aug':
+			return '8';
+		case 'Sep':
+			return '9';
+		case 'Oct':
+			return '10';
+		case 'Nov':
+			return '11';
+		default:
+			return '12';
+	}
+};
+var elm$time$Time$flooredDiv = F2(
+	function (numerator, denominator) {
+		return elm$core$Basics$floor(numerator / denominator);
+	});
+var elm$time$Time$posixToMillis = function (_n0) {
+	var millis = _n0.a;
+	return millis;
+};
+var elm$time$Time$toAdjustedMinutesHelp = F3(
+	function (defaultOffset, posixMinutes, eras) {
+		toAdjustedMinutesHelp:
+		while (true) {
+			if (!eras.b) {
+				return posixMinutes + defaultOffset;
+			} else {
+				var era = eras.a;
+				var olderEras = eras.b;
+				if (_Utils_cmp(era.start, posixMinutes) < 0) {
+					return posixMinutes + era.offset;
+				} else {
+					var $temp$defaultOffset = defaultOffset,
+						$temp$posixMinutes = posixMinutes,
+						$temp$eras = olderEras;
+					defaultOffset = $temp$defaultOffset;
+					posixMinutes = $temp$posixMinutes;
+					eras = $temp$eras;
+					continue toAdjustedMinutesHelp;
+				}
+			}
+		}
+	});
+var elm$time$Time$toAdjustedMinutes = F2(
+	function (_n0, time) {
+		var defaultOffset = _n0.a;
+		var eras = _n0.b;
+		return A3(
+			elm$time$Time$toAdjustedMinutesHelp,
+			defaultOffset,
+			A2(
+				elm$time$Time$flooredDiv,
+				elm$time$Time$posixToMillis(time),
+				60000),
+			eras);
+	});
+var elm$core$Basics$ge = _Utils_ge;
+var elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var elm$time$Time$toCivil = function (minutes) {
+	var rawDay = A2(elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
+	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
+	var dayOfEra = rawDay - (era * 146097);
+	var yearOfEra = ((((dayOfEra - ((dayOfEra / 1460) | 0)) + ((dayOfEra / 36524) | 0)) - ((dayOfEra / 146096) | 0)) / 365) | 0;
+	var dayOfYear = dayOfEra - (((365 * yearOfEra) + ((yearOfEra / 4) | 0)) - ((yearOfEra / 100) | 0));
+	var mp = (((5 * dayOfYear) + 2) / 153) | 0;
+	var month = mp + ((mp < 10) ? 3 : (-9));
+	var year = yearOfEra + (era * 400);
+	return {
+		day: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		month: month,
+		year: year + ((month <= 2) ? 1 : 0)
+	};
+};
+var elm$time$Time$toDay = F2(
+	function (zone, time) {
+		return elm$time$Time$toCivil(
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).day;
+	});
+var elm$core$Basics$modBy = _Basics_modBy;
+var elm$time$Time$toHour = F2(
+	function (zone, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			24,
+			A2(
+				elm$time$Time$flooredDiv,
+				A2(elm$time$Time$toAdjustedMinutes, zone, time),
+				60));
+	});
+var elm$time$Time$toMinute = F2(
+	function (zone, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			60,
+			A2(elm$time$Time$toAdjustedMinutes, zone, time));
+	});
+var elm$time$Time$Apr = {$: 'Apr'};
+var elm$time$Time$Aug = {$: 'Aug'};
+var elm$time$Time$Dec = {$: 'Dec'};
+var elm$time$Time$Feb = {$: 'Feb'};
+var elm$time$Time$Jan = {$: 'Jan'};
+var elm$time$Time$Jul = {$: 'Jul'};
+var elm$time$Time$Jun = {$: 'Jun'};
+var elm$time$Time$Mar = {$: 'Mar'};
+var elm$time$Time$May = {$: 'May'};
+var elm$time$Time$Nov = {$: 'Nov'};
+var elm$time$Time$Oct = {$: 'Oct'};
+var elm$time$Time$Sep = {$: 'Sep'};
+var elm$time$Time$toMonth = F2(
+	function (zone, time) {
+		var _n0 = elm$time$Time$toCivil(
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).month;
+		switch (_n0) {
+			case 1:
+				return elm$time$Time$Jan;
+			case 2:
+				return elm$time$Time$Feb;
+			case 3:
+				return elm$time$Time$Mar;
+			case 4:
+				return elm$time$Time$Apr;
+			case 5:
+				return elm$time$Time$May;
+			case 6:
+				return elm$time$Time$Jun;
+			case 7:
+				return elm$time$Time$Jul;
+			case 8:
+				return elm$time$Time$Aug;
+			case 9:
+				return elm$time$Time$Sep;
+			case 10:
+				return elm$time$Time$Oct;
+			case 11:
+				return elm$time$Time$Nov;
+			default:
+				return elm$time$Time$Dec;
+		}
+	});
+var elm$time$Time$toSecond = F2(
+	function (_n0, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			60,
+			A2(
+				elm$time$Time$flooredDiv,
+				elm$time$Time$posixToMillis(time),
+				1000));
+	});
+var elm$time$Time$toYear = F2(
+	function (zone, time) {
+		return elm$time$Time$toCivil(
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).year;
+	});
+var elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var elm$time$Time$utc = A2(elm$time$Time$Zone, 0, _List_Nil);
+var author$project$PostForm$toUtcString = function (time) {
+	return elm$core$String$fromInt(
+		A2(elm$time$Time$toHour, elm$time$Time$utc, time)) + (':' + (author$project$PostForm$addZero(
+		A2(elm$time$Time$toMinute, elm$time$Time$utc, time)) + (':' + (author$project$PostForm$addZero(
+		A2(elm$time$Time$toSecond, elm$time$Time$utc, time)) + (' | ' + (elm$core$String$fromInt(
+		A2(elm$time$Time$toDay, elm$time$Time$utc, time)) + ('/' + (author$project$PostForm$toIntMonth(
+		A2(elm$time$Time$toMonth, elm$time$Time$utc, time)) + ('/' + elm$core$String$fromInt(
+		A2(elm$time$Time$toYear, elm$time$Time$utc, time)))))))))));
+};
 var cuducos$elm_format_number$Helpers$FormattedNumber = F5(
 	function (original, integers, decimals, prefix, suffix) {
 		return {decimals: decimals, integers: integers, original: original, prefix: prefix, suffix: suffix};
@@ -6129,9 +6309,6 @@ var cuducos$elm_format_number$Helpers$classify = function (formatted) {
 				elm$core$List$singleton(
 					A2(elm$core$Maybe$withDefault, '', formatted.decimals)))));
 	return onlyZeros ? cuducos$elm_format_number$Helpers$Zero : ((formatted.original < 0) ? cuducos$elm_format_number$Helpers$Negative : cuducos$elm_format_number$Helpers$Positive);
-};
-var elm$core$Basics$negate = function (n) {
-	return -n;
 };
 var elm$core$String$slice = _String_slice;
 var elm$core$String$dropRight = F2(
@@ -6190,7 +6367,6 @@ var elm$core$List$head = function (list) {
 	}
 };
 var elm$core$String$filter = _String_filter;
-var elm$core$Basics$ge = _Utils_ge;
 var elm$core$Basics$not = _Basics_not;
 var elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
@@ -6551,6 +6727,10 @@ var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$html$Html$tr = _VirtualDom_node('tr');
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var elm$time$Time$millisToPosix = elm$time$Time$Posix;
 var author$project$PostForm$viewBmi = function (bmi) {
 	return A2(
 		elm$html$Html$tr,
@@ -6589,7 +6769,9 @@ var author$project$PostForm$viewBmi = function (bmi) {
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text(bmi.dateTime)
+						elm$html$Html$text(
+						author$project$PostForm$toUtcString(
+							elm$time$Time$millisToPosix(bmi.dateTimeStep)))
 					])),
 				A2(
 				elm$html$Html$td,
