@@ -1,25 +1,21 @@
 package com.mironov.bmi.Model;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class BmiRecord {
 
     private float bmi;
 
+    private String name;
+
     //dimension is kg
     private int weight;
 
-    //dimention is centimeter
+    //dimension is centimeter
     private int height;
 
-    private String name;
 
-    private String dateTime;
-
-
-
-    private DateTimeFormatter formatter;
+    //time that represents millisecond from the UNIX Epoch
+    private long dateTimeStep;
 
     public float getBmi() {
         return bmi;
@@ -29,28 +25,27 @@ public class BmiRecord {
         this.bmi = bmi;
     }
 
-
-    public BmiRecord(String name, int height, int weight) {
-
-        this.weight = weight;
-
-        formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd  HH:mm:ss");
-        this.dateTime=LocalDateTime.now().format(formatter);
-
-        this.bmi= (float) (1000.0*weight/height/height);
+    public BmiRecord(String name, int height, int weight,long dateTimeStep,float bmi) {
 
         this.name=name;
 
-        this.height=height;
-    }
+        this.weight = weight;
 
+        this.height=height;
+
+        this.dateTimeStep=dateTimeStep;
+
+        this.bmi=bmi;
+    }
 
     @Override
     public String toString() {
         return "BmiRecord{" +
                 "bmi=" + bmi +
+                ", name='" + name + '\'' +
                 ", weight=" + weight +
-                ", dateTime=" + dateTime +
+                ", height=" + height +
+                ", dateTimeStep=" + dateTimeStep +
                 '}';
     }
 }

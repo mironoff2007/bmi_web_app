@@ -18,8 +18,8 @@ public class MockDAOImpl implements MockDAO {
         return bmiList;
     }
 
-    public void addBmiRecord(String name, int height, int weight){
-            bmiList.add(new BmiRecord(name, height,weight));
+    public void addBmiRecord(String name, int height, int weight,long dateTimeStep,float bmi){
+            bmiList.add(new BmiRecord(name, height,weight, dateTimeStep, bmi));
     }
 
 

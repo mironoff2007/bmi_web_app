@@ -5,6 +5,8 @@ import com.mironov.bmi.Model.BmiRecord;
 import com.mironov.bmi.WrongNumberException;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ServiceImpl implements Service {
@@ -26,7 +28,11 @@ public class ServiceImpl implements Service {
             throw new WrongNumberException("Wrong number");
         }
         else {
-            mockDAO.addBmiRecord(name, height, weight);
+            long dateTimeStep=LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
+
+            float bmi= (float) (1000.0*weight/height/height);
+
+            mockDAO.addBmiRecord(name, height, weight, dateTimeStep, bmi);
         }
     }
 

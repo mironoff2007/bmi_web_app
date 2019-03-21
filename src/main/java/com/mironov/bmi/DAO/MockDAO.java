@@ -8,5 +8,5 @@ public interface MockDAO {
 
     public CopyOnWriteArrayList<BmiRecord> getBmiList() ;
 
-    public void addBmiRecord(String name, int height, int weight);
+    public void addBmiRecord(String name, int height, int weight,long dateTimeStep,float bmi);
 }
