@@ -6871,6 +6871,139 @@ var author$project$PostForm$viewBmis = function (bmis) {
 					A2(elm$core$List$map, author$project$PostForm$viewBmi, bmis)))
 			]));
 };
+var elm$core$Result$withDefault = F2(
+	function (def, result) {
+		if (result.$ === 'Ok') {
+			var a = result.a;
+			return a;
+		} else {
+			return def;
+		}
+	});
+var fredcy$elm_parseint$ParseInt$InvalidRadix = function (a) {
+	return {$: 'InvalidRadix', a: a};
+};
+var elm$core$Result$andThen = F2(
+	function (callback, result) {
+		if (result.$ === 'Ok') {
+			var value = result.a;
+			return callback(value);
+		} else {
+			var msg = result.a;
+			return elm$core$Result$Err(msg);
+		}
+	});
+var fredcy$elm_parseint$ParseInt$InvalidChar = function (a) {
+	return {$: 'InvalidChar', a: a};
+};
+var fredcy$elm_parseint$ParseInt$OutOfRange = function (a) {
+	return {$: 'OutOfRange', a: a};
+};
+var fredcy$elm_parseint$ParseInt$charOffset = F2(
+	function (basis, c) {
+		return elm$core$Char$toCode(c) - elm$core$Char$toCode(basis);
+	});
+var fredcy$elm_parseint$ParseInt$isBetween = F3(
+	function (lower, upper, c) {
+		var ci = elm$core$Char$toCode(c);
+		return (_Utils_cmp(
+			elm$core$Char$toCode(lower),
+			ci) < 1) && (_Utils_cmp(
+			ci,
+			elm$core$Char$toCode(upper)) < 1);
+	});
+var fredcy$elm_parseint$ParseInt$intFromChar = F2(
+	function (radix, c) {
+		var validInt = function (i) {
+			return (_Utils_cmp(i, radix) < 0) ? elm$core$Result$Ok(i) : elm$core$Result$Err(
+				fredcy$elm_parseint$ParseInt$OutOfRange(c));
+		};
+		var toInt = A3(
+			fredcy$elm_parseint$ParseInt$isBetween,
+			_Utils_chr('0'),
+			_Utils_chr('9'),
+			c) ? elm$core$Result$Ok(
+			A2(
+				fredcy$elm_parseint$ParseInt$charOffset,
+				_Utils_chr('0'),
+				c)) : (A3(
+			fredcy$elm_parseint$ParseInt$isBetween,
+			_Utils_chr('a'),
+			_Utils_chr('z'),
+			c) ? elm$core$Result$Ok(
+			10 + A2(
+				fredcy$elm_parseint$ParseInt$charOffset,
+				_Utils_chr('a'),
+				c)) : (A3(
+			fredcy$elm_parseint$ParseInt$isBetween,
+			_Utils_chr('A'),
+			_Utils_chr('Z'),
+			c) ? elm$core$Result$Ok(
+			10 + A2(
+				fredcy$elm_parseint$ParseInt$charOffset,
+				_Utils_chr('A'),
+				c)) : elm$core$Result$Err(
+			fredcy$elm_parseint$ParseInt$InvalidChar(c))));
+		return A2(elm$core$Result$andThen, validInt, toInt);
+	});
+var fredcy$elm_parseint$ParseInt$parseIntR = F2(
+	function (radix, rstring) {
+		var _n0 = elm$core$String$uncons(rstring);
+		if (_n0.$ === 'Nothing') {
+			return elm$core$Result$Ok(0);
+		} else {
+			var _n1 = _n0.a;
+			var c = _n1.a;
+			var rest = _n1.b;
+			return A2(
+				elm$core$Result$andThen,
+				function (ci) {
+					return A2(
+						elm$core$Result$andThen,
+						function (ri) {
+							return elm$core$Result$Ok(ci + (ri * radix));
+						},
+						A2(fredcy$elm_parseint$ParseInt$parseIntR, radix, rest));
+				},
+				A2(fredcy$elm_parseint$ParseInt$intFromChar, radix, c));
+		}
+	});
+var fredcy$elm_parseint$ParseInt$parseIntRadix = F2(
+	function (radix, string) {
+		return ((2 <= radix) && (radix <= 36)) ? A2(
+			fredcy$elm_parseint$ParseInt$parseIntR,
+			radix,
+			elm$core$String$reverse(string)) : elm$core$Result$Err(
+			fredcy$elm_parseint$ParseInt$InvalidRadix(radix));
+	});
+var fredcy$elm_parseint$ParseInt$parseInt = fredcy$elm_parseint$ParseInt$parseIntRadix(10);
+var author$project$PostForm$viewValidation = function (model) {
+	return (A2(
+		elm$core$Result$withDefault,
+		0,
+		fredcy$elm_parseint$ParseInt$parseInt(model.inputH)) <= 0) ? A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$style, 'color', 'red')
+			]),
+		_List_fromArray(
+			[
+				elm$html$Html$text('Wrong Height')
+			])) : ((A2(
+		elm$core$Result$withDefault,
+		0,
+		fredcy$elm_parseint$ParseInt$parseInt(model.inputW)) <= 0) ? A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$style, 'color', 'red')
+			]),
+		_List_fromArray(
+			[
+				elm$html$Html$text('Wrong Weight')
+			])) : A2(elm$html$Html$div, _List_Nil, _List_Nil));
+};
 var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$input = _VirtualDom_node('input');
@@ -6967,6 +7100,7 @@ var author$project$PostForm$view = function (model) {
 					]),
 				_List_Nil),
 				A2(elm$html$Html$br, _List_Nil, _List_Nil),
+				author$project$PostForm$viewValidation(model),
 				A2(
 				elm$html$Html$button,
 				_List_fromArray(

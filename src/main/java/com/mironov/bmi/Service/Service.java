@@ -3,10 +3,11 @@ package com.mironov.bmi.Service;
 import com.mironov.bmi.Model.BmiRecord;
 import com.mironov.bmi.WrongNumberException;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
+
 
 public interface Service {
-    public CopyOnWriteArrayList<BmiRecord> getBmiList();
+     List<BmiRecord> getBmiList();
 
-    public void saveBmi(String name, int height, int weight) throws WrongNumberException;
+     void saveBmi(String name, int height, int weight) throws WrongNumberException;
 }

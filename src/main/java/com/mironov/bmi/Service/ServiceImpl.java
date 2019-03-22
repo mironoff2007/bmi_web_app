@@ -1,23 +1,23 @@
 package com.mironov.bmi.Service;
 
-import com.mironov.bmi.DAO.MockDAO;
+import com.mironov.bmi.DAO.DAO;
 import com.mironov.bmi.Model.BmiRecord;
 import com.mironov.bmi.WrongNumberException;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 public class ServiceImpl implements Service {
 
     @Inject
-    MockDAO mockDAO;
+    DAO dao;
 
     public ServiceImpl() {}
 
-    public CopyOnWriteArrayList<BmiRecord> getBmiList() {
-        return mockDAO.getBmiList();
+    public List<BmiRecord> getBmiList() {
+        return dao.getBmiList();
     }
 
     public void saveBmi(String name,int height, int weight) throws WrongNumberException {
@@ -32,7 +32,7 @@ public class ServiceImpl implements Service {
 
             float bmi= (float) (1000.0*weight/height/height);
 
-            mockDAO.addBmiRecord(name, height, weight, dateTimeStep, bmi);
+            dao.addBmiRecord(name, height, weight, dateTimeStep, bmi);
         }
     }
 

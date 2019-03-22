@@ -1,6 +1,7 @@
 port module PostForm exposing (main)
 
 import Browser
+
 import Html.Events exposing (onInput)
 import Html.Events exposing (onClick)
 import Html exposing (..)
@@ -18,9 +19,11 @@ import Json.Decode exposing (Decoder, float, int, map5, string)
 import FormatNumber.Locales exposing (Locale)
 
 import FormatNumber exposing (format)
+import ParseInt exposing (Error)
 import Time exposing (Month(..), toDay, toHour, toMinute, toMonth, toSecond, toYear, utc)
 import Time
 
+import Validate exposing (Validator, ifBlank, ifNotInt, validate)
 type alias Model =
     {
      result : Maybe (Result Http.Error ())
@@ -138,6 +141,7 @@ view model =
              br[][],
              input [ placeholder "Height",value model.inputH, onInput GetInputH ][],
              br[][],
+             viewValidation model,
              button [ onClick PostIt ] [ text "POST" ],
              br[][],
              text <| if (Debug.toString model.result)=="Just (Err (BadStatus 415))"
@@ -152,7 +156,14 @@ view model =
              ]
 
 
-
+viewValidation : Model -> Html msg
+viewValidation model =
+  if (ParseInt.parseInt(model.inputH)|> Result.withDefault 0) <=0 then
+    div [ style "color" "red" ] [ text "Wrong Height" ]
+  else if (ParseInt.parseInt(model.inputW)|> Result.withDefault 0) <=0 then
+    div [ style "color" "red" ] [ text "Wrong Weight" ]
+  else
+     div[][]
 
 
 

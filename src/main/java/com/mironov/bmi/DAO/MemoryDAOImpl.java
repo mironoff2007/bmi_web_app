@@ -2,19 +2,20 @@ package com.mironov.bmi.DAO;
 
 import com.mironov.bmi.Model.BmiRecord;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public class MockDAOImpl implements MockDAO {
+public class MemoryDAOImpl implements DAO {
 
 
-    private CopyOnWriteArrayList<BmiRecord> bmiList;
+    private final List<BmiRecord> bmiList;
 
-    public MockDAOImpl() {
+    public MemoryDAOImpl() {
         bmiList = new CopyOnWriteArrayList<>();
     }
 
-    public CopyOnWriteArrayList<BmiRecord> getBmiList() {
+    public List<BmiRecord> getBmiList() {
         return bmiList;
     }
 

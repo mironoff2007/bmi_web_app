@@ -55,7 +55,7 @@ public class GuiceServlet extends HttpServlet {
         System.out.println(body);
 
         //get fields
-        JsonObject obj=gson.fromJson(body,JsonObject.class);
+        final JsonObject obj=gson.fromJson(body,JsonObject.class);
 
         //add bmi and check
         try {
