@@ -2,6 +2,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.mironov.bmi.DAO.MockDAO;
+import com.mironov.bmi.DAO.MockDAOImpl;
 import com.mironov.bmi.Service.Service;
 import com.mironov.bmi.Service.ServiceImpl;
 import com.mironov.bmi.WrongNumberException;
@@ -17,6 +19,7 @@ public class ServiceTest {
         @Override
         protected void configure() {
             bind(Service.class).to(ServiceImpl.class);
+            bind(MockDAO.class).to(MockDAOImpl.class);
         }
     });
 

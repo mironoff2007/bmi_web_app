@@ -1,10 +1,10 @@
 package com.mironov.bmi;
 
+
 import com.mironov.bmi.Service.Service;
 
 import com.google.gson.Gson;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 
@@ -17,30 +17,24 @@ import java.util.stream.Collectors;
 @Singleton
 public class GuiceServlet extends HttpServlet {
 
-    private Service service;
-
-    private Gson gson = new Gson();
+    private final Service service;
+    private final Gson gson = new Gson();
 
     private class JsonObject{
         int height;
         int weight;
         String name;
-
     }
 
-    public GuiceServlet(){
-        //create injector
-        Injector injector= Guice.createInjector(new MyModule());
-        service= injector.getInstance(Service.class);
-
+    @Inject
+    public GuiceServlet(Service service){
+        this.service=service;
         try {
             service.saveBmi("Vasja",178,65);
             service.saveBmi("Petja",170,68);
         } catch (WrongNumberException e) {
             e.printStackTrace();
         }
-
-
     }
 
     //Returns List of Json object with fields - bmi:float,weight:int[kg],name:string,height:int[cm],dateTime:string
@@ -69,8 +63,6 @@ public class GuiceServlet extends HttpServlet {
         } catch (WrongNumberException e) {
             response.setStatus(415);
         }
-
-
     }
 
     private static String getBody(HttpServletRequest request) throws IOException {
