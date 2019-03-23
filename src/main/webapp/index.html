@@ -6,19 +6,12 @@
     </style>
 </head>
 <body>
-
-
-<br>
-
-
 <main></main>
 <div id="postForm"></div>
 <script src="postForm.js"></script>
 <script>
-
     var app = Elm.PostForm.init({node: document.querySelector('main')})
     app.ports.receiveUrl.send(window.location.href);
-
 </script>
 </body>
 </html>

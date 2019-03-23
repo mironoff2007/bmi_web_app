@@ -5001,7 +5001,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$PostForm$init = function (_n0) {
 	return _Utils_Tuple2(
-		{bmis: _List_Nil, inputH: '', inputN: '', inputW: '', result: elm$core$Maybe$Nothing, url: ''},
+		{bmis: _List_Nil, error: '', inputH: '', inputN: '', inputW: '', result: elm$core$Maybe$Nothing, url: ''},
 		elm$core$Platform$Cmd$none);
 };
 var author$project$PostForm$ReceivedURL = function (a) {
@@ -5012,6 +5012,120 @@ var author$project$PostForm$receiveUrl = _Platform_incomingPort('receiveUrl', el
 var author$project$PostForm$subscriptions = function (_n0) {
 	return author$project$PostForm$receiveUrl(author$project$PostForm$ReceivedURL);
 };
+var elm$core$Basics$always = F2(
+	function (a, _n0) {
+		return a;
+	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var rtfeldman$elm_validate$Validate$Validator = function (a) {
+	return {$: 'Validator', a: a};
+};
+var rtfeldman$elm_validate$Validate$all = function (validators) {
+	var newGetErrors = function (subject) {
+		var accumulateErrors = F2(
+			function (_n0, totalErrors) {
+				var getErrors = _n0.a;
+				return _Utils_ap(
+					totalErrors,
+					getErrors(subject));
+			});
+		return A3(elm$core$List$foldl, accumulateErrors, _List_Nil, validators);
+	};
+	return rtfeldman$elm_validate$Validate$Validator(newGetErrors);
+};
+var rtfeldman$elm_validate$Validate$ifTrue = F2(
+	function (test, error) {
+		var getErrors = function (subject) {
+			return test(subject) ? _List_fromArray(
+				[error]) : _List_Nil;
+		};
+		return rtfeldman$elm_validate$Validate$Validator(getErrors);
+	});
+var rtfeldman$elm_validate$Validate$isWhitespaceChar = function (_char) {
+	return _Utils_eq(
+		_char,
+		_Utils_chr(' ')) || (_Utils_eq(
+		_char,
+		_Utils_chr('\n')) || (_Utils_eq(
+		_char,
+		_Utils_chr('\t')) || _Utils_eq(
+		_char,
+		_Utils_chr('\u000d'))));
+};
+var rtfeldman$elm_validate$Validate$isBlank = function (str) {
+	isBlank:
+	while (true) {
+		var _n0 = elm$core$String$uncons(str);
+		if (_n0.$ === 'Just') {
+			var _n1 = _n0.a;
+			var _char = _n1.a;
+			var rest = _n1.b;
+			if (rtfeldman$elm_validate$Validate$isWhitespaceChar(_char)) {
+				var $temp$str = rest;
+				str = $temp$str;
+				continue isBlank;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+};
+var rtfeldman$elm_validate$Validate$ifBlank = F2(
+	function (subjectToString, error) {
+		return A2(
+			rtfeldman$elm_validate$Validate$ifTrue,
+			function (subject) {
+				return rtfeldman$elm_validate$Validate$isBlank(
+					subjectToString(subject));
+			},
+			error);
+	});
+var elm$core$String$toInt = _String_toInt;
+var rtfeldman$elm_validate$Validate$isInt = function (str) {
+	var _n0 = elm$core$String$toInt(str);
+	if (_n0.$ === 'Nothing') {
+		return false;
+	} else {
+		return true;
+	}
+};
+var rtfeldman$elm_validate$Validate$ifNotInt = F2(
+	function (subjectToString, errorFromString) {
+		var getErrors = function (subject) {
+			var str = subjectToString(subject);
+			return rtfeldman$elm_validate$Validate$isInt(str) ? _List_Nil : _List_fromArray(
+				[
+					errorFromString(str)
+				]);
+		};
+		return rtfeldman$elm_validate$Validate$Validator(getErrors);
+	});
+var author$project$PostForm$modelValidator = rtfeldman$elm_validate$Validate$all(
+	_List_fromArray(
+		[
+			A2(
+			rtfeldman$elm_validate$Validate$ifBlank,
+			function ($) {
+				return $.inputN;
+			},
+			'Please enter a name.'),
+			A2(
+			rtfeldman$elm_validate$Validate$ifNotInt,
+			function ($) {
+				return $.inputW;
+			},
+			elm$core$Basics$always('Please enter weight greater than zero.')),
+			A2(
+			rtfeldman$elm_validate$Validate$ifNotInt,
+			function ($) {
+				return $.inputH;
+			},
+			elm$core$Basics$always('Please enter height greater than zero.'))
+		]));
 var author$project$PostForm$PostResult = function (a) {
 	return {$: 'PostResult', a: a};
 };
@@ -5024,7 +5138,6 @@ var elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var elm$core$String$toInt = _String_toInt;
 var elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -5969,9 +6082,6 @@ var author$project$PostForm$bmiDecoder = A6(
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$PostForm$bmiListDecoder = elm$json$Json$Decode$list(author$project$PostForm$bmiDecoder);
 var elm$http$Http$emptyBody = _Http_emptyBody;
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
@@ -6006,6 +6116,22 @@ var author$project$PostForm$upload = function (url) {
 			url: url + 'servlet'
 		});
 };
+var elm$core$Debug$toString = _Debug_toString;
+var rtfeldman$elm_validate$Validate$Valid = function (a) {
+	return {$: 'Valid', a: a};
+};
+var rtfeldman$elm_validate$Validate$validate = F2(
+	function (_n0, subject) {
+		var getErrors = _n0.a;
+		var _n1 = getErrors(subject);
+		if (!_n1.b) {
+			return elm$core$Result$Ok(
+				rtfeldman$elm_validate$Validate$Valid(subject));
+		} else {
+			var errors = _n1;
+			return elm$core$Result$Err(errors);
+		}
+	});
 var author$project$PostForm$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6059,11 +6185,24 @@ var author$project$PostForm$update = F2(
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
 			default:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{result: elm$core$Maybe$Nothing}),
-					author$project$PostForm$post(model));
+				var _n2 = A2(rtfeldman$elm_validate$Validate$validate, author$project$PostForm$modelValidator, model);
+				if (_n2.$ === 'Ok') {
+					var value = _n2.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{error: ''}),
+						author$project$PostForm$post(model));
+				} else {
+					var value = _n2.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: elm$core$Debug$toString(value)
+							}),
+						elm$core$Platform$Cmd$none);
+				}
 		}
 	});
 var author$project$PostForm$GetInputH = function (a) {
@@ -6082,23 +6221,23 @@ var author$project$PostForm$addZero = function (_int) {
 var author$project$PostForm$toIntMonth = function (month) {
 	switch (month.$) {
 		case 'Jan':
-			return '1';
+			return '01';
 		case 'Feb':
-			return '2';
+			return '02';
 		case 'Mar':
-			return '3';
+			return '03';
 		case 'Apr':
-			return '4';
+			return '04';
 		case 'May':
-			return '5';
+			return '05';
 		case 'Jun':
-			return '6';
+			return '06';
 		case 'Jul':
-			return '7';
+			return '07';
 		case 'Aug':
-			return '8';
+			return '08';
 		case 'Sep':
-			return '9';
+			return '09';
 		case 'Oct':
 			return '10';
 		case 'Nov':
@@ -6698,7 +6837,6 @@ var cuducos$elm_format_number$FormatNumber$Locales$Locale = F7(
 	function (decimals, thousandSeparator, decimalSeparator, negativePrefix, negativeSuffix, positivePrefix, positiveSuffix) {
 		return {decimalSeparator: decimalSeparator, decimals: decimals, negativePrefix: negativePrefix, negativeSuffix: negativeSuffix, positivePrefix: positivePrefix, positiveSuffix: positiveSuffix, thousandSeparator: thousandSeparator};
 	});
-var elm$core$Debug$toString = _Debug_toString;
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
@@ -6871,117 +7009,8 @@ var author$project$PostForm$viewBmis = function (bmis) {
 					A2(elm$core$List$map, author$project$PostForm$viewBmi, bmis)))
 			]));
 };
-var elm$core$Result$withDefault = F2(
-	function (def, result) {
-		if (result.$ === 'Ok') {
-			var a = result.a;
-			return a;
-		} else {
-			return def;
-		}
-	});
-var fredcy$elm_parseint$ParseInt$InvalidRadix = function (a) {
-	return {$: 'InvalidRadix', a: a};
-};
-var elm$core$Result$andThen = F2(
-	function (callback, result) {
-		if (result.$ === 'Ok') {
-			var value = result.a;
-			return callback(value);
-		} else {
-			var msg = result.a;
-			return elm$core$Result$Err(msg);
-		}
-	});
-var fredcy$elm_parseint$ParseInt$InvalidChar = function (a) {
-	return {$: 'InvalidChar', a: a};
-};
-var fredcy$elm_parseint$ParseInt$OutOfRange = function (a) {
-	return {$: 'OutOfRange', a: a};
-};
-var fredcy$elm_parseint$ParseInt$charOffset = F2(
-	function (basis, c) {
-		return elm$core$Char$toCode(c) - elm$core$Char$toCode(basis);
-	});
-var fredcy$elm_parseint$ParseInt$isBetween = F3(
-	function (lower, upper, c) {
-		var ci = elm$core$Char$toCode(c);
-		return (_Utils_cmp(
-			elm$core$Char$toCode(lower),
-			ci) < 1) && (_Utils_cmp(
-			ci,
-			elm$core$Char$toCode(upper)) < 1);
-	});
-var fredcy$elm_parseint$ParseInt$intFromChar = F2(
-	function (radix, c) {
-		var validInt = function (i) {
-			return (_Utils_cmp(i, radix) < 0) ? elm$core$Result$Ok(i) : elm$core$Result$Err(
-				fredcy$elm_parseint$ParseInt$OutOfRange(c));
-		};
-		var toInt = A3(
-			fredcy$elm_parseint$ParseInt$isBetween,
-			_Utils_chr('0'),
-			_Utils_chr('9'),
-			c) ? elm$core$Result$Ok(
-			A2(
-				fredcy$elm_parseint$ParseInt$charOffset,
-				_Utils_chr('0'),
-				c)) : (A3(
-			fredcy$elm_parseint$ParseInt$isBetween,
-			_Utils_chr('a'),
-			_Utils_chr('z'),
-			c) ? elm$core$Result$Ok(
-			10 + A2(
-				fredcy$elm_parseint$ParseInt$charOffset,
-				_Utils_chr('a'),
-				c)) : (A3(
-			fredcy$elm_parseint$ParseInt$isBetween,
-			_Utils_chr('A'),
-			_Utils_chr('Z'),
-			c) ? elm$core$Result$Ok(
-			10 + A2(
-				fredcy$elm_parseint$ParseInt$charOffset,
-				_Utils_chr('A'),
-				c)) : elm$core$Result$Err(
-			fredcy$elm_parseint$ParseInt$InvalidChar(c))));
-		return A2(elm$core$Result$andThen, validInt, toInt);
-	});
-var fredcy$elm_parseint$ParseInt$parseIntR = F2(
-	function (radix, rstring) {
-		var _n0 = elm$core$String$uncons(rstring);
-		if (_n0.$ === 'Nothing') {
-			return elm$core$Result$Ok(0);
-		} else {
-			var _n1 = _n0.a;
-			var c = _n1.a;
-			var rest = _n1.b;
-			return A2(
-				elm$core$Result$andThen,
-				function (ci) {
-					return A2(
-						elm$core$Result$andThen,
-						function (ri) {
-							return elm$core$Result$Ok(ci + (ri * radix));
-						},
-						A2(fredcy$elm_parseint$ParseInt$parseIntR, radix, rest));
-				},
-				A2(fredcy$elm_parseint$ParseInt$intFromChar, radix, c));
-		}
-	});
-var fredcy$elm_parseint$ParseInt$parseIntRadix = F2(
-	function (radix, string) {
-		return ((2 <= radix) && (radix <= 36)) ? A2(
-			fredcy$elm_parseint$ParseInt$parseIntR,
-			radix,
-			elm$core$String$reverse(string)) : elm$core$Result$Err(
-			fredcy$elm_parseint$ParseInt$InvalidRadix(radix));
-	});
-var fredcy$elm_parseint$ParseInt$parseInt = fredcy$elm_parseint$ParseInt$parseIntRadix(10);
 var author$project$PostForm$viewValidation = function (model) {
-	return (A2(
-		elm$core$Result$withDefault,
-		0,
-		fredcy$elm_parseint$ParseInt$parseInt(model.inputH)) <= 0) ? A2(
+	return (model.error !== '') ? A2(
 		elm$html$Html$div,
 		_List_fromArray(
 			[
@@ -6989,20 +7018,8 @@ var author$project$PostForm$viewValidation = function (model) {
 			]),
 		_List_fromArray(
 			[
-				elm$html$Html$text('Wrong Height')
-			])) : ((A2(
-		elm$core$Result$withDefault,
-		0,
-		fredcy$elm_parseint$ParseInt$parseInt(model.inputW)) <= 0) ? A2(
-		elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2(elm$html$Html$Attributes$style, 'color', 'red')
-			]),
-		_List_fromArray(
-			[
-				elm$html$Html$text('Wrong Weight')
-			])) : A2(elm$html$Html$div, _List_Nil, _List_Nil));
+				elm$html$Html$text(model.error)
+			])) : A2(elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$button = _VirtualDom_node('button');
@@ -7113,7 +7130,7 @@ var author$project$PostForm$view = function (model) {
 					])),
 				A2(elm$html$Html$br, _List_Nil, _List_Nil),
 				elm$html$Html$text(
-				(elm$core$Debug$toString(model.result) === 'Just (Err (BadStatus 415))') ? ('Response: ' + 'wrong number') : ((elm$core$Debug$toString(model.result) === 'Nothing') ? '' : ((elm$core$Debug$toString(model.result) === 'Just (Ok ())') ? 'Ok' : elm$core$Debug$toString(model.result)))),
+				(elm$core$Debug$toString(model.result) === 'Just (Ok ())') ? '' : ((elm$core$Debug$toString(model.result) === 'Nothing') ? '' : elm$core$Debug$toString(model.result))),
 				author$project$PostForm$viewBmis(model.bmis)
 			]));
 };

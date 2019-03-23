@@ -19,14 +19,16 @@ import Json.Decode exposing (Decoder, float, int, map5, string)
 import FormatNumber.Locales exposing (Locale)
 
 import FormatNumber exposing (format)
-import ParseInt exposing (Error)
+
 import Time exposing (Month(..), toDay, toHour, toMinute, toMonth, toSecond, toYear, utc)
 import Time
 
 import Validate exposing (Validator, ifBlank, ifNotInt, validate)
+
 type alias Model =
     {
-     result : Maybe (Result Http.Error ())
+     error: String
+    ,result : Maybe (Result Http.Error ())
     ,inputW:String
     ,inputH:String
     ,inputN:String
@@ -58,15 +60,15 @@ bmiListDecoder =
 toIntMonth : Month -> String
 toIntMonth month =
   case month of
-    Jan -> "1"
-    Feb -> "2"
-    Mar -> "3"
-    Apr -> "4"
-    May -> "5"
-    Jun -> "6"
-    Jul -> "7"
-    Aug -> "8"
-    Sep -> "9"
+    Jan -> "01"
+    Feb -> "02"
+    Mar -> "03"
+    Apr -> "04"
+    May -> "05"
+    Jun -> "06"
+    Jul -> "07"
+    Aug -> "08"
+    Sep -> "09"
     Oct -> "10"
     Nov -> "11"
     Dec -> "12"
@@ -93,7 +95,7 @@ addZero int =if int<10 then ("0"++String.fromInt(int))else String.fromInt(int)
 
 init : () -> (Model, Cmd Msg)
 init () =
-    ({ result = Nothing , inputW="", inputH="", inputN="",url="",bmis=[]}, Cmd.none)
+    ({error="", result = Nothing , inputW="", inputH="", inputN="",url="",bmis=[]}, Cmd.none)
 
 type Msg
     = PostIt
@@ -127,7 +129,9 @@ update msg model =
             Ok bmis ->( {model | bmis = bmis}, Cmd.none)
 
             Err _ ->(model, Cmd.none)
-    PostIt ->( {model| result = Nothing},post model)
+    PostIt -> case validate modelValidator model of
+                Ok value -> ( {model| error=""},post model)
+                Err value -> ( {model| error=Debug.toString value}, Cmd.none)
 
 
 view : Model -> Html Msg
@@ -135,7 +139,7 @@ view model =
 
             div[]
             [
-            input [ placeholder "Name",value model.inputN, onInput GetInputN ][],
+             input [ placeholder "Name",value model.inputN, onInput GetInputN ][],
              br[][],
              input [ placeholder "Weight",value model.inputW, onInput GetInputW ][],
              br[][],
@@ -144,27 +148,31 @@ view model =
              viewValidation model,
              button [ onClick PostIt ] [ text "POST" ],
              br[][],
-             text <| if (Debug.toString model.result)=="Just (Err (BadStatus 415))"
-                        then "Response: " ++"wrong number"
-                        else if (Debug.toString model.result)=="Nothing"
-                        then ""
-                         else if (Debug.toString model.result)=="Just (Ok ())"
-                         then "Ok"
-                         else Debug.toString model.result
-                         ,viewBmis model.bmis
-
+             text <|  if (Debug.toString model.result)=="Just (Ok ())"
+                       then ""
+                       else if(Debug.toString model.result)=="Nothing"
+                       then ""
+                       else Debug.toString model.result
+             ,viewBmis model.bmis
              ]
+
+
 
 
 viewValidation : Model -> Html msg
 viewValidation model =
-  if (ParseInt.parseInt(model.inputH)|> Result.withDefault 0) <=0 then
-    div [ style "color" "red" ] [ text "Wrong Height" ]
-  else if (ParseInt.parseInt(model.inputW)|> Result.withDefault 0) <=0 then
-    div [ style "color" "red" ] [ text "Wrong Weight" ]
+  if model.error/="" then
+    div [ style "color" "red" ] [ text model.error ]
   else
      div[][]
 
+modelValidator : Validator String Model
+modelValidator =
+    Validate.all
+        [ ifBlank .inputN "Please enter a name."
+        , ifNotInt .inputW (always"Please enter weight greater than zero.")
+        , ifNotInt .inputH (always "Please enter height greater than zero.")
+        ]
 
 
 -- VIEW
