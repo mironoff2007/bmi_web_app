@@ -2,7 +2,6 @@ package com.mironov.bmi.Service;
 
 import com.mironov.bmi.DAO.DAO;
 import com.mironov.bmi.Model.BmiRecord;
-import com.mironov.bmi.WrongNumberException;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -20,12 +19,12 @@ public class ServiceImpl implements Service {
         return dao.getBmiList();
     }
 
-    public void saveBmi(String name,int height, int weight) throws WrongNumberException {
+    public void saveBmi(String name,int height, int weight) throws IllegalArgumentException {
         if(weight<=0){
-            throw new WrongNumberException("Wrong number");
+            throw new IllegalArgumentException("Wrong number");
         }
         else if(height<=0){
-            throw new WrongNumberException("Wrong number");
+            throw new IllegalArgumentException("Wrong number");
         }
         else {
             long dateTimeStep=LocalDateTime.now().toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();

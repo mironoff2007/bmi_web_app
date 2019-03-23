@@ -32,7 +32,7 @@ public class GuiceServlet extends HttpServlet {
         try {
             service.saveBmi("Vasja",178,65);
             service.saveBmi("Petja",170,68);
-        } catch (WrongNumberException e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -60,7 +60,7 @@ public class GuiceServlet extends HttpServlet {
         //add bmi and check
         try {
             service.saveBmi(obj.name, obj.height, obj.weight);
-        } catch (WrongNumberException e) {
+        } catch (IllegalArgumentException e) {
             response.setStatus(415);
         }
     }
