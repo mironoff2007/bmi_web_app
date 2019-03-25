@@ -1,4 +1,0 @@
-elm make src/GetTable.elm --output=getTable.js
-
-elm make src/PostForm.elm --output=postForm.js
-

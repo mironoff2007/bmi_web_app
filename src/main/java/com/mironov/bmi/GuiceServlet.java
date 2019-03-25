@@ -1,6 +1,7 @@
 package com.mironov.bmi;
 
 
+import com.mironov.bmi.DAO.TableManager;
 import com.mironov.bmi.Service.Service;
 
 import com.google.gson.Gson;
@@ -31,6 +32,7 @@ public class GuiceServlet extends HttpServlet {
     public GuiceServlet(Service service){
         this.service=service;
         try {
+            TableManager.resetTable();
             service.saveBmi("Vasja",178,65);
             service.saveBmi("Petja",170,68);
         } catch (IllegalArgumentException e) {

@@ -1,0 +1,2 @@
+elm make src/PostForm.elm --output=src/webapp/postForm.js
+
