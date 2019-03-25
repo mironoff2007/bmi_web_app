@@ -52,7 +52,7 @@ public class DAOImpl implements DAO {
     }
 
     @Override
-    public void addBmiRecord(String name, int height, int weight, long dateTimeStep, float bmi) {
+    public void addBmiRecord( float bmi, String name, int height, int weight, long dateTimeStep) {
 
     }
 }

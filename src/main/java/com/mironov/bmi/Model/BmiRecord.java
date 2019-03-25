@@ -25,19 +25,6 @@ public class BmiRecord {
         this.bmi = bmi;
     }
 
-    public BmiRecord(String name, int height, int weight,long dateTimeStep,float bmi) {
-
-        this.name=name;
-
-        this.weight = weight;
-
-        this.height=height;
-
-        this.dateTimeStep=dateTimeStep;
-
-        this.bmi=bmi;
-    }
-
     public BmiRecord(float bmi, String name, int weight, int height, long dateTimeStep) {
         this.bmi = bmi;
         this.name = name;

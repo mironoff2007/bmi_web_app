@@ -37,7 +37,7 @@ public class ServiceImpl implements Service {
 
             float bmi= (float) (1000.0*weight/height/height);
 
-            dao.addBmiRecord(name, height, weight, dateTimeStep, bmi);
+            dao.addBmiRecord(bmi, name, height, weight, dateTimeStep);
         }
     }
 

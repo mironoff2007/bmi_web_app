@@ -8,6 +8,7 @@ import com.google.inject.Injector;
 import com.mironov.bmi.DAO.DAO;
 import com.mironov.bmi.DAO.DAOImpl;
 import com.mironov.bmi.DAO.TableManager;
+import com.mironov.bmi.Model.BmiRecord;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +27,7 @@ public class DAOImplTest {
     public DAO dao;
 
     @Before
-    public void setup () {
+    public void setup() {
         injector.injectMembers(this);
     }
 
