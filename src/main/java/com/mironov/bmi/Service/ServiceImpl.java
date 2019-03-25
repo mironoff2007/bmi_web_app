@@ -25,7 +25,7 @@ public class ServiceImpl implements Service {
         }
     }
 
-    public void saveBmi(String name,int height, int weight) throws IllegalArgumentException {
+    public void saveBmi(String name,int height, int weight) throws IllegalArgumentException, SQLException {
         if(weight<=0){
             throw new IllegalArgumentException("Wrong number");
         }
@@ -37,7 +37,7 @@ public class ServiceImpl implements Service {
 
             float bmi= (float) (1000.0*weight/height/height);
 
-            dao.addBmiRecord(bmi, name, height, weight, dateTimeStep);
+            dao.addBmiRecord(bmi, name, weight, height, dateTimeStep);
         }
     }
 

@@ -8,6 +8,8 @@ import com.mironov.bmi.Service.Service;
 import com.mironov.bmi.Service.ServiceImpl;
 import org.junit.*;
 
+import java.sql.SQLException;
+
 
 public class ServiceTest {
 
@@ -29,17 +31,17 @@ public class ServiceTest {
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void testWrongHeight()  {
+    public void testWrongHeight() throws SQLException {
             service.saveBmi("Vasja",-1,65);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testWrongWeight()  {
+    public void testWrongWeight() throws SQLException {
             service.saveBmi("Vasja",90,-1);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testWrongWeightAndheight()  {
+    public void testWrongWeightAndheight() throws SQLException {
             service.saveBmi("Vasja",0,-1);
     }
 

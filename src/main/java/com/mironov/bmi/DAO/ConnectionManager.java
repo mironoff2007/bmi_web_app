@@ -9,8 +9,8 @@ import java.sql.SQLException;
 public class ConnectionManager {
     private static String url = "jdbc:postgresql://localhost:5432/postgres";
     private static String driverName = "org.postgresql.Driver";
-    private static String username = "postgres";
-    private static String password = "postgres";
+    private static String username = "admin";
+    private static String password = "admin";
     private static Connection con;
 
 

@@ -52,7 +52,18 @@ public class DAOImpl implements DAO {
     }
 
     @Override
-    public void addBmiRecord( float bmi, String name, int height, int weight, long dateTimeStep) {
-
+    public void addBmiRecord( float bmi, String name, int weight, int height, long dateTimeStep) throws SQLException {
+        Statement stmt = null;
+        String query = "INSERT INTO \"bmi\" VALUES \n" +
+                "("+bmi+",'"+name+"',"+weight+","+height+","+dateTimeStep+");";
+        System.out.println(query);
+        try {
+            stmt = connection.createStatement();
+            stmt.executeUpdate(query);
+        } catch (SQLException e ) {
+            throw e;
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
     }
 }

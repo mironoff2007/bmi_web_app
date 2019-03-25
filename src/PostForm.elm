@@ -133,7 +133,7 @@ update msg model =
                 Ok value -> ( {model| error=""},post model)
                 Err value -> ( {model| error=Debug.toString value}, Cmd.none)
 
-
+--TODO wrap to forms
 view : Model -> Html Msg
 view model =
 

@@ -49,4 +49,9 @@ public class TableManager {
         stmt.execute(drop);
     }
 
+    public static void resetTable() throws SQLException {
+        dropTable();
+        createTable();
+    }
+
 }

@@ -10,5 +10,5 @@ public interface DAO {
 
      List<BmiRecord> getBmiList() throws SQLException;
 
-     void addBmiRecord(float bmi, String name, int height, int weight,long dateTimeStep);
+     void addBmiRecord(float bmi, String name, int weight, int height,long dateTimeStep) throws SQLException;
 }

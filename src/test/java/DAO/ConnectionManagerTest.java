@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class ConnectionManagerTest {
     @Test
-    public void testWrongHeight()  {
+    public void testConnection()  {
         Connection con=ConnectionManager.getConnection();
         assertNotNull(con);
     }

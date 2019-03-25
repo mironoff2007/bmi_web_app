@@ -11,6 +11,8 @@ import com.mironov.bmi.DAO.TableManager;
 import com.mironov.bmi.Model.BmiRecord;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
+import java.util.ArrayList;
 
 import java.sql.SQLException;
 
@@ -33,9 +35,21 @@ public class DAOImplTest {
 
     @Test
     public void testGetBmiList() throws SQLException {
-        TableManager.dropTable();
-        TableManager.createTable();
+        TableManager.resetTable();
         TableManager.populateTable();
         System.out.println(dao.getBmiList().toString());
+        TableManager.resetTable();
+    }
+
+    @Test
+    public void testAddBmi() throws SQLException {
+        TableManager.resetTable();
+        dao.addBmiRecord(2,"test1",60, 160,1553518802960L);
+        ArrayList<BmiRecord> list=new ArrayList<BmiRecord>();
+        list.add(new BmiRecord(2,"test1",60, 160,1553518802960L));
+        System.out.println(dao.getBmiList().toString());
+        System.out.println(list.toString());
+        assertEquals(true,(list.toString().equals(dao.getBmiList().toString())));
+        TableManager.resetTable();
     }
 }

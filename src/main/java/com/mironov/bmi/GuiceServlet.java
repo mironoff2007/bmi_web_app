@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -33,6 +34,8 @@ public class GuiceServlet extends HttpServlet {
             service.saveBmi("Vasja",178,65);
             service.saveBmi("Petja",170,68);
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -62,6 +65,8 @@ public class GuiceServlet extends HttpServlet {
             service.saveBmi(obj.name, obj.height, obj.weight);
         } catch (IllegalArgumentException e) {
             response.setStatus(415);
+        } catch (SQLException e) {
+
         }
     }
 
