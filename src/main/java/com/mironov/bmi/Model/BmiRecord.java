@@ -38,6 +38,14 @@ public class BmiRecord {
         this.bmi=bmi;
     }
 
+    public BmiRecord(float bmi, String name, int weight, int height, long dateTimeStep) {
+        this.bmi = bmi;
+        this.name = name;
+        this.weight = weight;
+        this.height = height;
+        this.dateTimeStep = dateTimeStep;
+    }
+
     @Override
     public String toString() {
         return "BmiRecord{" +

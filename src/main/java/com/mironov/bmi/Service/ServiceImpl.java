@@ -4,6 +4,7 @@ import com.mironov.bmi.DAO.DAO;
 import com.mironov.bmi.Model.BmiRecord;
 
 import javax.inject.Inject;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -16,7 +17,12 @@ public class ServiceImpl implements Service {
     public ServiceImpl() {}
 
     public List<BmiRecord> getBmiList() {
-        return dao.getBmiList();
+        try {
+            return dao.getBmiList();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void saveBmi(String name,int height, int weight) throws IllegalArgumentException {

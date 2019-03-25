@@ -14,25 +14,7 @@ public class ConnectionManager {
     private static String password = "postgres";
     private static Connection con;
 
-    private static String crateTable=
-            "DROP TABLE IF EXISTS bmi;\n" +
-            "\n" +
-            "CREATE TABLE \"bmi\" (\n" +
-            "  \n" +
-            "  bmi float DEFAULT NULL,\n" +
-            "  \n" +
-            "  name varchar DEFAULT NULL,\n" +
-            "\n" +
-            "  weight int  Default 1, \n" +
-            "  \n" +
-            "  height int Default 1,\n" +
-            "\n" +
-            "  dateTimeStep bigint Default 1\n" +
-            ") ;\n" +
-            "\n" +
-            "INSERT INTO \"bmi\" VALUES \n" +
-            "\t(2.0515087,'Vasja',65,178,1553518802929),\n" +
-            "\t(2.3529413,'Petja',68,170,1553518802960);";
+
 
     public static Connection getConnection() {
         try {
@@ -50,9 +32,5 @@ public class ConnectionManager {
         return con;
     }
 
-    public static void createTable() throws SQLException {
-        Statement stmt = con.createStatement();
-            // create a new table
-            stmt.execute(crateTable);
-    }
+
 }
