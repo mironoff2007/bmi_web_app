@@ -131,7 +131,7 @@ update msg model =
             Err _ ->(model, Cmd.none)
     PostIt -> case validate modelValidator model of
                 Ok value -> ( {model| error=""},post model)
-                Err value -> ( {model| error=D.errorToString value}, Cmd.none)
+                Err value -> ( {model| error=Debug.toString value}, Cmd.none)
 
 --TODO wrap in forms
 view : Model -> Html Msg
